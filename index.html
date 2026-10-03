@@ -9,14 +9,14 @@
   <style>
     body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     .card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    
+
     .table-responsive {
       max-height: 550px;
       overflow-x: auto;
       overflow-y: auto;
       white-space: nowrap;
     }
-    
+
     th, td {
       vertical-align: middle;
       font-size: 0.88rem;
@@ -44,6 +44,75 @@
       font-size: 0.75rem;
       padding: 2px 5px;
       margin-top: 4px;
+    }
+
+    /* CUSTOM CONTEXT / DROPDOWN MENU */
+    .custom-context-menu {
+      display: none;
+      position: fixed;
+      z-index: 99999 !important;
+      background: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      min-width: 170px;
+      padding: 4px 0;
+      font-size: 0.85rem;
+    }
+
+    .custom-context-menu ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .custom-context-menu li {
+      position: relative;
+    }
+
+    .custom-context-menu li a, 
+    .custom-context-menu li button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 7px 14px;
+      color: #333;
+      text-decoration: none;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .custom-context-menu li a:hover, 
+    .custom-context-menu li button:hover {
+      background-color: #0d6efd;
+      color: #ffffff;
+    }
+
+    /* Submenu Floating ala OS Click Menu */
+    .custom-context-menu li .submenu {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: -4px;
+      background: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      min-width: 160px;
+      padding: 4px 0;
+    }
+
+    .custom-context-menu li:hover > .submenu {
+      display: block;
+    }
+
+    .custom-context-menu hr {
+      margin: 4px 0;
+      border-color: #e9ecef;
     }
   </style>
 </head>
@@ -253,10 +322,15 @@
   </div>
 </div>
 
+<!-- POPUP CONTEXT MENU DROPDOWN DI PALING DEPAN -->
+<div id="contextMenu" class="custom-context-menu">
+  <ul id="contextMenuList"></ul>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT KAMU
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_Dw3Yi3YiDWHy9eI3oetITSmvi86JZ2Cn0e3atwjJZzkbFduiDXZJyVmhk4aAA5a-/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOuV6EuzLPRtYDfT4cym-0EMN-zUohUi3tcGBVq5eQodKlSYPw1iFREReucQcR4-U/exec";
 
   let dataset = [];
   let filteredData = [];
@@ -270,6 +344,14 @@
   document.addEventListener('DOMContentLoaded', () => {
     spdoModalInstance = new bootstrap.Modal(document.getElementById('spdoModal'));
     loadTableData();
+
+    // Sembunyikan menu popup jika klik di luar
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('contextMenu');
+      if (!menu.contains(e.target) && !e.target.closest('.btn-print-menu')) {
+        menu.style.display = 'none';
+      }
+    });
   });
 
   function formatDateToIndonesian(dateString) {
@@ -286,7 +368,7 @@
   async function handleFormSubmit(e) {
     e.preventDefault();
     const form = e.target;
-    
+
     const rawDate = document.getElementById('inputTanggal').value;
     document.getElementById('formattedTanggalText').value = formatDateToIndonesian(rawDate);
 
@@ -407,23 +489,6 @@
     pageData.forEach((row) => {
       const originalIdx = dataset.indexOf(row);
       const jenis = (row['JENIS'] || '').toUpperCase();
-      let options = [];
-
-      if (jenis === 'LCL') {
-        options = ['LCL TUGASS', 'LCL SKDO'];
-      } else if (jenis === 'FCL') {
-        options = ['FCL TUGAS', 'FCL SKDO'];
-      }
-
-      let printButtons = options.map(opt => 
-        `<button class="btn btn-sm btn-outline-primary m-1" onclick="printDoc(${originalIdx}, '${opt}', event)">
-          <i class="bi bi-file-earmark-pdf"></i> ${opt}
-         </button>`
-      ).join('');
-
-      printButtons += `<button class="btn btn-sm btn-outline-warning m-1" onclick="openSpdoModal(${originalIdx})">
-        <i class="bi bi-file-earmark-text"></i> SPDO
-      </button>`;
 
       tbody.innerHTML += `
         <tr>
@@ -442,12 +507,87 @@
           <td>${row['TANGGAL_TEXT'] || row['tangal TEXT'] || '-'}</td>
           <td>${row['CNEE'] || '-'}</td>
           <td>${row['staff'] || '-'}</td>
-          <td class="text-center sticky-action">${printButtons}</td>
+          <td class="text-center sticky-action">
+            <button class="btn btn-sm btn-primary btn-print-menu" onclick="toggleContextMenu(event, ${originalIdx})">
+              <i class="bi bi-printer me-1"></i> Cetak <i class="bi bi-chevron-down ms-1 small"></i>
+            </button>
+          </td>
         </tr>
       `;
     });
 
     renderPagination();
+  }
+
+  /* POPUP MENU ALA KLIK KANAN KOMPUTER */
+  function toggleContextMenu(event, index) {
+    event.stopPropagation();
+    const rowData = dataset[index];
+    if (!rowData) return;
+
+    const jenis = (rowData['JENIS'] || '').toUpperCase();
+    let options = [];
+    if (jenis === 'LCL') {
+      options = ['LCL TUGASS', 'LCL SKDO'];
+    } else if (jenis === 'FCL') {
+      options = ['FCL TUGAS', 'FCL SKDO'];
+    }
+
+    const menuList = document.getElementById('contextMenuList');
+    menuList.innerHTML = '';
+
+    // Menu dokumen langsung (TUGAS & SKDO)
+    options.forEach(opt => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <button onclick="triggerPrintDoc(${index}, '${opt}', event)">
+          <span><i class="bi bi-file-earmark-pdf text-danger me-2"></i>Cetak ${opt}</span>
+        </button>
+      `;
+      menuList.appendChild(li);
+    });
+
+    // Separator line
+    if (options.length > 0) {
+      const hrLi = document.createElement('li');
+      hrLi.innerHTML = `<hr>`;
+      menuList.appendChild(hrLi);
+    }
+
+    // Submenu SPDO dengan panah kekanan
+    const spdoLi = document.createElement('li');
+    spdoLi.innerHTML = `
+      <a href="javascript:void(0)" onclick="openSpdoModal(${index}); hideContextMenu();">
+        <span><i class="bi bi-file-earmark-word text-primary me-2"></i>Template SPDO (${jenis})</span>
+        <i class="bi bi-chevron-right ms-2 text-muted small"></i>
+      </a>
+    `;
+    menuList.appendChild(spdoLi);
+
+    // Hitung posisi tepat di sebelah tombol
+    const menu = document.getElementById('contextMenu');
+    menu.style.display = 'block';
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    let left = rect.left;
+    let top = rect.bottom + 2;
+
+    // Supaya menu tidak keluar layar sebelah kanan
+    if (left + 180 > window.innerWidth) {
+      left = window.innerWidth - 190;
+    }
+
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+  }
+
+  function hideContextMenu() {
+    document.getElementById('contextMenu').style.display = 'none';
+  }
+
+  async function triggerPrintDoc(index, opt, evt) {
+    hideContextMenu();
+    await printDoc(index, opt, evt);
   }
 
   function renderPagination() {
@@ -570,10 +710,13 @@
     const rowData = dataset[index];
     if (!rowData) return;
 
-    const btn = evt.currentTarget;
-    const oldHtml = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Process...`;
+    const btn = evt ? evt.currentTarget : null;
+    let oldHtml = '';
+    if (btn) {
+      oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Process...`;
+    }
 
     try {
       const response = await fetch(APPS_SCRIPT_URL, {
@@ -582,8 +725,10 @@
       });
       const res = await response.json();
 
-      btn.disabled = false;
-      btn.innerHTML = oldHtml;
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
 
       if (res.success) {
         downloadPdfBase64(res.pdfBase64, res.fileName);
@@ -591,8 +736,10 @@
         alert('Gagal membuat PDF: ' + res.error);
       }
     } catch (err) {
-      btn.disabled = false;
-      btn.innerHTML = oldHtml;
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
       alert('Error: ' + err.message);
     }
   }
