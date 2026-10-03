@@ -22,11 +22,6 @@
       font-size: 0.88rem;
     }
 
-    .filter-input {
-      font-size: 0.78rem;
-      padding: 2px 6px;
-    }
-
     .sticky-action {
       position: sticky;
       right: 0;
@@ -43,6 +38,12 @@
     .list-group-item-action:hover {
       background-color: #e9ecef;
       cursor: pointer;
+    }
+
+    .filter-input {
+      font-size: 0.75rem;
+      padding: 2px 5px;
+      margin-top: 4px;
     }
   </style>
 </head>
@@ -139,20 +140,10 @@
   <div class="card p-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h5 class="fw-bold text-secondary m-0"><i class="bi bi-table me-1"></i> Data Masuk & Cetak Document</h5>
-      
-      <!-- PAGINATION CONTROLS -->
-      <div class="d-flex align-items-center">
-        <span id="pageInfo" class="me-3 text-muted small fw-semibold">Halaman 1</span>
-        <button class="btn btn-outline-primary btn-sm me-1" id="btnPrev" onclick="changePage(-1)" disabled><i class="bi bi-chevron-left"></i> Prev</button>
-        <button class="btn btn-outline-primary btn-sm" id="btnNext" onclick="changePage(1)" disabled>Next <i class="bi bi-chevron-right"></i></button>
-      </div>
-    </div>
-
-    <!-- GLOBAL SEARCH BAR -->
-    <div class="mb-3">
-      <div class="input-group">
-        <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
-        <input type="text" id="globalSearch" class="form-control" placeholder="Cari data apa saja di dalam tabel..." onkeyup="filterAndPaginateTable()">
+      <!-- SEARCH BAR -->
+      <div class="input-group style-search" style="max-width: 300px;">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Cari data..." oninput="handleSearch()">
       </div>
     </div>
 
@@ -160,47 +151,71 @@
       <table class="table table-hover table-striped table-bordered align-middle" id="dataTable">
         <thead class="table-primary text-center">
           <tr>
-            <th>NO</th>
-            <th>JENIS</th>
-            <th>NOMOR SURAT</th>
-            <th>TERTUJU</th>
-            <th>MBL</th>
-            <th>HBL</th>
-            <th>VESSEL</th>
-            <th>POL/POD</th>
-            <th>ASAL KOTA</th>
-            <th>PACKAGES</th>
-            <th>QUANTITY</th>
-            <th>CONTAINER</th>
-            <th>TANGGAL TEXT</th>
-            <th>CNEE</th>
-            <th>STAFF</th>
-            <th class="sticky-action">Aksi Print PDF</th>
-          </tr>
-          <!-- FILTER HEADER ROW -->
-          <tr class="bg-light">
-            <th></th>
             <th>
-              <select id="filterJenis" class="form-select filter-input" onchange="filterAndPaginateTable()">
+              NO
+              <input type="text" class="form-control filter-input" oninput="filterTable(0, this.value)">
+            </th>
+            <th>
+              JENIS
+              <select class="form-select filter-input" onchange="filterTable(1, this.value)">
                 <option value="">Semua</option>
                 <option value="LCL">LCL</option>
                 <option value="FCL">FCL</option>
               </select>
             </th>
-            <th><input type="text" id="filterNoSurat" class="form-control filter-input" placeholder="Filter..." onkeyup="filterAndPaginateTable()"></th>
-            <th><input type="text" id="filterTertuju" class="form-control filter-input" placeholder="Filter..." onkeyup="filterAndPaginateTable()"></th>
-            <th><input type="text" id="filterMBL" class="form-control filter-input" placeholder="Filter..." onkeyup="filterAndPaginateTable()"></th>
-            <th><input type="text" id="filterHBL" class="form-control filter-input" placeholder="Filter..." onkeyup="filterAndPaginateTable()"></th>
-            <th><input type="text" id="filterVessel" class="form-control filter-input" placeholder="Filter..." onkeyup="filterAndPaginateTable()"></th>
-            <th><input type="text" id="filterPOL" class="form-control filter-input" placeholder="Filter..." onkeyup="filterAndPaginateTable()"></th>
-            <th><input type="text" id="filterKota" class="form-control filter-input" placeholder="Filter..." onkeyup="filterAndPaginateTable()"></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th><input type="text" id="filterCNEE" class="form-control filter-input" placeholder="Filter..." onkeyup="filterAndPaginateTable()"></th>
-            <th><input type="text" id="filterStaff" class="form-control filter-input" placeholder="Filter..." onkeyup="filterAndPaginateTable()"></th>
-            <th class="sticky-action"></th>
+            <th>
+              NOMOR SURAT
+              <input type="text" class="form-control filter-input" oninput="filterTable(2, this.value)">
+            </th>
+            <th>
+              TERTUJU
+              <input type="text" class="form-control filter-input" oninput="filterTable(3, this.value)">
+            </th>
+            <th>
+              MBL
+              <input type="text" class="form-control filter-input" oninput="filterTable(4, this.value)">
+            </th>
+            <th>
+              HBL
+              <input type="text" class="form-control filter-input" oninput="filterTable(5, this.value)">
+            </th>
+            <th>
+              VESSEL
+              <input type="text" class="form-control filter-input" oninput="filterTable(6, this.value)">
+            </th>
+            <th>
+              POL/POD
+              <input type="text" class="form-control filter-input" oninput="filterTable(7, this.value)">
+            </th>
+            <th>
+              ASAL KOTA
+              <input type="text" class="form-control filter-input" oninput="filterTable(8, this.value)">
+            </th>
+            <th>
+              PACKAGES
+              <input type="text" class="form-control filter-input" oninput="filterTable(9, this.value)">
+            </th>
+            <th>
+              QUANTITY
+              <input type="text" class="form-control filter-input" oninput="filterTable(10, this.value)">
+            </th>
+            <th>
+              CONTAINER
+              <input type="text" class="form-control filter-input" oninput="filterTable(11, this.value)">
+            </th>
+            <th>
+              TANGGAL TEXT
+              <input type="text" class="form-control filter-input" oninput="filterTable(12, this.value)">
+            </th>
+            <th>
+              CNEE
+              <input type="text" class="form-control filter-input" oninput="filterTable(13, this.value)">
+            </th>
+            <th>
+              STAFF
+              <input type="text" class="form-control filter-input" oninput="filterTable(14, this.value)">
+            </th>
+            <th class="sticky-action">Aksi Print PDF</th>
           </tr>
         </thead>
         <tbody id="tableBody">
@@ -208,6 +223,15 @@
         </tbody>
       </table>
     </div>
+
+    <!-- PAGINATION (TAMPILAN 10 DATA) -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div id="pageInfo" class="small text-muted">Menampilkan 0 dari 0 data</div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0" id="paginationControls"></ul>
+      </nav>
+    </div>
+
   </div>
 </div>
 
@@ -231,12 +255,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxW76_1KAQT70IaMteyvw9UOQaE8OmIAzVPNEVyzY8zvmgYwNlwwYP2CYWG8qBdPFY/exec";
+  // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT KAMU
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOuV6EuzLPRtYDfT4cym-0EMN-zUohUi3tcGBVq5eQodKlSYPw1iFREReucQcR4-U/exec";
 
-  let rawDataset = [];
-  let filteredDataset = [];
+  let dataset = [];
+  let filteredData = [];
   let currentPage = 1;
-  const pageSize = 10;
+  const rowsPerPage = 10;
+  let columnFilters = {};
 
   let selectedRowIndex = null;
   let spdoModalInstance = null;
@@ -257,7 +283,7 @@
     return `${parts[2]} ${months[parseInt(parts[1], 10) - 1]} ${parts[0]}`;
   }
 
-  function handleFormSubmit(e) {
+  async function handleFormSubmit(e) {
     e.preventDefault();
     const form = e.target;
     
@@ -272,116 +298,88 @@
     btn.disabled = true;
     btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...`;
 
-    if (typeof google !== 'undefined' && google.script && google.script.run) {
-      google.script.run
-        .withSuccessHandler(res => {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="bi bi-save me-1"></i> Simpan Data`;
-          if (res.success) {
-            alert(res.message);
-            form.reset();
-            loadTableData();
-          } else {
-            alert(res.message);
-          }
-        })
-        .withFailureHandler(err => {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="bi bi-save me-1"></i> Simpan Data`;
-          alert("Error: " + err);
-        })
-        .saveData(dataObj);
-    } else {
-      fetch(APPS_SCRIPT_URL, {
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify({ action: 'saveData', payload: dataObj })
-      })
-      .then(res => res.json())
-      .then(res => {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="bi bi-save me-1"></i> Simpan Data`;
-        if (res.success) {
-          alert(res.message || "Data berhasil disimpan!");
-          form.reset();
-          loadTableData();
-        } else {
-          alert(res.message || "Gagal menyimpan data.");
-        }
-      })
-      .catch(err => {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="bi bi-save me-1"></i> Simpan Data`;
-        alert("Error: " + err.message);
       });
+      const res = await response.json();
+
+      if (res.success) {
+        alert(res.message || "Data berhasil disimpan!");
+        form.reset();
+      } else {
+        alert(res.message || "Gagal menyimpan data.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="bi bi-save me-1"></i> Simpan Data`;
+      loadTableData();
     }
   }
 
-  function loadTableData() {
+  async function loadTableData() {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '<tr><td colspan="16" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>';
 
-    if (typeof google !== 'undefined' && google.script && google.script.run) {
-      google.script.run
-        .withSuccessHandler(data => {
-          rawDataset = data || [];
-          filterAndPaginateTable();
-        })
-        .withFailureHandler(err => {
-          tbody.innerHTML = `<tr><td colspan="16" class="text-center text-danger py-4">Gagal memuat data: ${err}</td></tr>`;
-        })
-        .getData();
-    } else {
-      fetch(`${APPS_SCRIPT_URL}?action=getData`)
-        .then(res => res.json())
-        .then(data => {
-          rawDataset = data || [];
-          filterAndPaginateTable();
-        })
-        .catch(err => {
-          tbody.innerHTML = `<tr><td colspan="16" class="text-center text-danger py-4">Gagal memuat data: ${err.message}</td></tr>`;
-        });
+    try {
+      const response = await fetch(`${APPS_SCRIPT_URL}?action=getData`);
+      const data = await response.json();
+      dataset = data || [];
+      filteredData = [...dataset];
+      currentPage = 1;
+      renderTable();
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="16" class="text-center text-danger py-4">Gagal memuat data: ${err.message}</td></tr>`;
     }
   }
 
-  function filterAndPaginateTable() {
-    const searchVal = document.getElementById('globalSearch').value.toLowerCase().trim();
-    const filterJenis = document.getElementById('filterJenis').value.toUpperCase();
-    const filterNoSurat = document.getElementById('filterNoSurat').value.toLowerCase().trim();
-    const filterTertuju = document.getElementById('filterTertuju').value.toLowerCase().trim();
-    const filterMBL = document.getElementById('filterMBL').value.toLowerCase().trim();
-    const filterHBL = document.getElementById('filterHBL').value.toLowerCase().trim();
-    const filterVessel = document.getElementById('filterVessel').value.toLowerCase().trim();
-    const filterPOL = document.getElementById('filterPOL').value.toLowerCase().trim();
-    const filterKota = document.getElementById('filterKota').value.toLowerCase().trim();
-    const filterCNEE = document.getElementById('filterCNEE').value.toLowerCase().trim();
-    const filterStaff = document.getElementById('filterStaff').value.toLowerCase().trim();
+  function handleSearch() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    applyAllFilters(query);
+  }
 
-    filteredDataset = rawDataset.filter(row => {
-      const jenis = (row['JENIS'] || '').toUpperCase();
-      const noSurat = String(row['NOMOR_SURAT'] || row['NOMOR SURAT'] || '').toLowerCase();
-      const tertuju = String(row['tertuju'] || '').toLowerCase();
-      const mbl = String(row['MBL'] || '').toLowerCase();
-      const hbl = String(row['HBL'] || '').toLowerCase();
-      const vessel = String(row['Vessel'] || '').toLowerCase();
-      const pol = String(row['POL_POD'] || row['POL/POD'] || '').toLowerCase();
-      const kota = String(row['ASAL_KOTA'] || row['ASAL KOTA'] || '').toLowerCase();
-      const cnee = String(row['CNEE'] || '').toLowerCase();
-      const staff = String(row['staff'] || '').toLowerCase();
+  function filterTable(colIdx, value) {
+    columnFilters[colIdx] = value.toLowerCase().trim();
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    applyAllFilters(query);
+  }
 
-      if (filterJenis && jenis !== filterJenis) return false;
-      if (filterNoSurat && !noSurat.includes(filterNoSurat)) return false;
-      if (filterTertuju && !tertuju.includes(filterTertuju)) return false;
-      if (filterMBL && !mbl.includes(filterMBL)) return false;
-      if (filterHBL && !hbl.includes(filterHBL)) return false;
-      if (filterVessel && !vessel.includes(filterVessel)) return false;
-      if (filterPOL && !pol.includes(filterPOL)) return false;
-      if (filterKota && !kota.includes(filterKota)) return false;
-      if (filterCNEE && !cnee.includes(filterCNEE)) return false;
-      if (filterStaff && !staff.includes(filterStaff)) return false;
+  function applyAllFilters(globalQuery) {
+    const colKeys = [
+      'NO', 'JENIS', 'NOMOR_SURAT', 'tertuju', 'MBL', 'HBL', 'Vessel', 
+      'POL_POD', 'ASAL_KOTA', 'PACKAGES', 'QUANTITY', 'Container', 
+      'TANGGAL_TEXT', 'CNEE', 'staff'
+    ];
 
-      if (searchVal) {
-        const fullRowText = Object.values(row).join(' ').toLowerCase();
-        if (!fullRowText.includes(searchVal)) return false;
+    filteredData = dataset.filter(row => {
+      // Global search check
+      if (globalQuery) {
+        const matchesGlobal = Object.values(row).some(val => 
+          String(val).toLowerCase().includes(globalQuery)
+        );
+        if (!matchesGlobal) return false;
+      }
+
+      // Column filters check
+      for (let colIdx in columnFilters) {
+        const filterVal = columnFilters[colIdx];
+        if (!filterVal) continue;
+
+        const key = colKeys[colIdx];
+        let cellVal = '';
+        if (key === 'NOMOR_SURAT') cellVal = row['NOMOR_SURAT'] || row['NOMOR SURAT'] || '';
+        else if (key === 'POL_POD') cellVal = row['POL_POD'] || row['POL/POD'] || '';
+        else if (key === 'ASAL_KOTA') cellVal = row['ASAL_KOTA'] || row['ASAL KOTA'] || '';
+        else if (key === 'QUANTITY') cellVal = row['QUANTITY'] || row['QUANTITIY'] || '';
+        else if (key === 'TANGGAL_TEXT') cellVal = row['TANGGAL_TEXT'] || row['tangal TEXT'] || '';
+        else cellVal = row[key] || '';
+
+        if (!String(cellVal).toLowerCase().includes(filterVal)) {
+          return false;
+        }
       }
 
       return true;
@@ -395,22 +393,19 @@
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
 
-    if (filteredDataset.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="16" class="text-center py-4 text-muted">Tidak ada data yang cocok.</td></tr>';
-      updatePaginationControls(0);
+    if (filteredData.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="16" class="text-center py-4 text-muted">Tidak ada data ditemukan.</td></tr>';
+      document.getElementById('pageInfo').innerText = 'Menampilkan 0 dari 0 data';
+      document.getElementById('paginationControls').innerHTML = '';
       return;
     }
 
-    const totalPages = Math.ceil(filteredDataset.length / pageSize);
-    if (currentPage > totalPages) currentPage = totalPages;
-    if (currentPage < 1) currentPage = 1;
-
-    const startIdx = (currentPage - 1) * pageSize;
-    const endIdx = startIdx + pageSize;
-    const pageData = filteredDataset.slice(startIdx, endIdx);
+    const startIdx = (currentPage - 1) * rowsPerPage;
+    const endIdx = startIdx + rowsPerPage;
+    const pageData = filteredData.slice(startIdx, endIdx);
 
     pageData.forEach((row) => {
-      const realDatasetIdx = rawDataset.indexOf(row);
+      const originalIdx = dataset.indexOf(row);
       const jenis = (row['JENIS'] || '').toUpperCase();
       let options = [];
 
@@ -421,12 +416,12 @@
       }
 
       let printButtons = options.map(opt => 
-        `<button class="btn btn-sm btn-outline-primary m-1" onclick="printDoc(${realDatasetIdx}, '${opt}', event)">
+        `<button class="btn btn-sm btn-outline-primary m-1" onclick="printDoc(${originalIdx}, '${opt}', event)">
           <i class="bi bi-file-earmark-pdf"></i> ${opt}
          </button>`
       ).join('');
 
-      printButtons += `<button class="btn btn-sm btn-outline-warning m-1" onclick="openSpdoModal(${realDatasetIdx})">
+      printButtons += `<button class="btn btn-sm btn-outline-warning m-1" onclick="openSpdoModal(${originalIdx})">
         <i class="bi bi-file-earmark-text"></i> SPDO
       </button>`;
 
@@ -452,34 +447,55 @@
       `;
     });
 
-    updatePaginationControls(totalPages);
+    renderPagination();
   }
 
-  function updatePaginationControls(totalPages) {
-    const pageInfo = document.getElementById('pageInfo');
-    const btnPrev = document.getElementById('btnPrev');
-    const btnNext = document.getElementById('btnNext');
+  function renderPagination() {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    const startCount = (currentPage - 1) * rowsPerPage + 1;
+    const endCount = Math.min(currentPage * rowsPerPage, filteredData.length);
 
-    if (totalPages === 0) {
-      pageInfo.innerText = 'Halaman 0 dari 0';
-      btnPrev.disabled = true;
-      btnNext.disabled = true;
-      return;
+    document.getElementById('pageInfo').innerText = `Menampilkan ${startCount}-${endCount} dari ${filteredData.length} data`;
+
+    const paginationControls = document.getElementById('paginationControls');
+    paginationControls.innerHTML = '';
+
+    if (totalPages <= 1) return;
+
+    // Previous Button
+    paginationControls.innerHTML += `
+      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Prev</a>
+      </li>
+    `;
+
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+      paginationControls.innerHTML += `
+        <li class="page-item ${currentPage === i ? 'active' : ''}">
+          <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+        </li>
+      `;
     }
 
-    pageInfo.innerText = `Halaman ${currentPage} dari ${totalPages} (Total ${filteredDataset.length} Data)`;
-    btnPrev.disabled = (currentPage <= 1);
-    btnNext.disabled = (currentPage >= totalPages);
+    // Next Button
+    paginationControls.innerHTML += `
+      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Next</a>
+      </li>
+    `;
   }
 
-  function changePage(direction) {
-    currentPage += direction;
+  function changePage(page) {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
     renderTable();
   }
 
-  function openSpdoModal(index) {
+  async function openSpdoModal(index) {
     selectedRowIndex = index;
-    const rowData = rawDataset[index];
+    const rowData = dataset[index];
     if (!rowData) return;
 
     const jenis = rowData['JENIS'];
@@ -490,10 +506,13 @@
     loading.style.display = 'block';
     spdoModalInstance.show();
 
-    const renderSpdoList = (spdoList) => {
+    try {
+      const response = await fetch(`${APPS_SCRIPT_URL}?action=getSpdoList&jenis=${encodeURIComponent(jenis)}`);
+      const spdoList = await response.json();
+
       loading.style.display = 'none';
       if (!spdoList || spdoList.length === 0) {
-        container.innerHTML = `<div class="p-3 text-center text-muted">Tidak ada template SPDO yang ditemukan untuk jenis <b>${jenis}</b>.</div>`;
+        container.innerHTML = '<div class="p-3 text-center text-muted">Tidak ada template SPDO yang ditemukan.</div>';
         return;
       }
 
@@ -510,79 +529,45 @@
         btn.onclick = (e) => printSpdoDoc(item.docId, item.name, e.currentTarget);
         container.appendChild(btn);
       });
-    };
-
-    if (typeof google !== 'undefined' && google.script && google.script.run) {
-      google.script.run
-        .withSuccessHandler(renderSpdoList)
-        .withFailureHandler(err => {
-          loading.style.display = 'none';
-          container.innerHTML = `<div class="p-3 text-center text-danger">Gagal memuat SPDO: ${err}</div>`;
-        })
-        .getSpdoList(jenis);
-    } else {
-      fetch(`${APPS_SCRIPT_URL}?action=getSpdoList&jenis=${encodeURIComponent(jenis)}`)
-        .then(res => res.json())
-        .then(renderSpdoList)
-        .catch(err => {
-          loading.style.display = 'none';
-          container.innerHTML = `<div class="p-3 text-center text-danger">Gagal memuat SPDO: ${err.message}</div>`;
-        });
+    } catch (err) {
+      loading.style.display = 'none';
+      container.innerHTML = `<div class="p-3 text-center text-danger">Gagal memuat SPDO: ${err.message}</div>`;
     }
   }
 
-  function printSpdoDoc(docId, name, btnElement) {
-    const rowData = rawDataset[selectedRowIndex];
+  async function printSpdoDoc(docId, name, btnElement) {
+    const rowData = dataset[selectedRowIndex];
     if (!rowData) return;
 
     const oldHtml = btnElement.innerHTML;
     btnElement.style.pointerEvents = 'none';
     btnElement.innerHTML = `<div><span class="spinner-border spinner-border-sm text-primary me-2"></span>Memproses PDF...</div>`;
 
-    if (typeof google !== 'undefined' && google.script && google.script.run) {
-      google.script.run
-        .withSuccessHandler(res => {
-          btnElement.style.pointerEvents = 'auto';
-          btnElement.innerHTML = oldHtml;
-          if (res.success) {
-            spdoModalInstance.hide();
-            downloadPdfBase64(res.pdfBase64, res.fileName);
-          } else {
-            alert('Gagal membuat PDF SPDO: ' + res.error);
-          }
-        })
-        .withFailureHandler(err => {
-          btnElement.style.pointerEvents = 'auto';
-          btnElement.innerHTML = oldHtml;
-          alert('Error: ' + err);
-        })
-        .generatePDF(rowData, docId, name);
-    } else {
-      fetch(APPS_SCRIPT_URL, {
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify({ action: 'generatePDF', rowData, docId, name })
-      })
-      .then(res => res.json())
-      .then(res => {
-        btnElement.style.pointerEvents = 'auto';
-        btnElement.innerHTML = oldHtml;
-        if (res.success) {
-          spdoModalInstance.hide();
-          downloadPdfBase64(res.pdfBase64, res.fileName);
-        } else {
-          alert('Gagal membuat PDF SPDO: ' + res.error);
-        }
-      })
-      .catch(err => {
-        btnElement.style.pointerEvents = 'auto';
-        btnElement.innerHTML = oldHtml;
-        alert('Error: ' + err.message);
       });
+      const res = await response.json();
+
+      btnElement.style.pointerEvents = 'auto';
+      btnElement.innerHTML = oldHtml;
+
+      if (res.success) {
+        spdoModalInstance.hide();
+        downloadPdfBase64(res.pdfBase64, res.fileName);
+      } else {
+        alert('Gagal membuat PDF SPDO: ' + res.error);
+      }
+    } catch (err) {
+      btnElement.style.pointerEvents = 'auto';
+      btnElement.innerHTML = oldHtml;
+      alert('Error: ' + err.message);
     }
   }
 
-  function printDoc(index, templateKey, evt) {
-    const rowData = rawDataset[index];
+  async function printDoc(index, templateKey, evt) {
+    const rowData = dataset[index];
     if (!rowData) return;
 
     const btn = evt.currentTarget;
@@ -590,43 +575,25 @@
     btn.disabled = true;
     btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Process...`;
 
-    if (typeof google !== 'undefined' && google.script && google.script.run) {
-      google.script.run
-        .withSuccessHandler(res => {
-          btn.disabled = false;
-          btn.innerHTML = oldHtml;
-          if (res.success) {
-            downloadPdfBase64(res.pdfBase64, res.fileName);
-          } else {
-            alert('Gagal membuat PDF: ' + res.error);
-          }
-        })
-        .withFailureHandler(err => {
-          btn.disabled = false;
-          btn.innerHTML = oldHtml;
-          alert('Error: ' + err);
-        })
-        .generatePDF(rowData, templateKey);
-    } else {
-      fetch(APPS_SCRIPT_URL, {
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify({ action: 'generatePDF', rowData, templateKey })
-      })
-      .then(res => res.json())
-      .then(res => {
-        btn.disabled = false;
-        btn.innerHTML = oldHtml;
-        if (res.success) {
-          downloadPdfBase64(res.pdfBase64, res.fileName);
-        } else {
-          alert('Gagal membuat PDF: ' + res.error);
-        }
-      })
-      .catch(err => {
-        btn.disabled = false;
-        btn.innerHTML = oldHtml;
-        alert('Error: ' + err.message);
       });
+      const res = await response.json();
+
+      btn.disabled = false;
+      btn.innerHTML = oldHtml;
+
+      if (res.success) {
+        downloadPdfBase64(res.pdfBase64, res.fileName);
+      } else {
+        alert('Gagal membuat PDF: ' + res.error);
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = oldHtml;
+      alert('Error: ' + err.message);
     }
   }
 
