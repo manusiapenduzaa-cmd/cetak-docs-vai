@@ -183,8 +183,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // GANTI URL DI BAWAL INI DENGAN URL WEB APP GOOGLE APPS SCRIPT KAMU
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYOUR_DEPLOYMENT_ID/exec";
+  // PASTEKAN URL WEB APP DARI GOOGLE APPS SCRIPT DI SINI
+  const APPS_SCRIPT_URL = "GANTI_DENGAN_URL_WEB_APP_KAMU";
 
   let dataset = [];
   let selectedRowIndex = null;
@@ -206,41 +206,25 @@
     return `${parts[2]} ${months[parseInt(parts[1], 10) - 1]} ${parts[0]}`;
   }
 
-  async function handleFormSubmit(e) {
-    e.preventDefault();
-    const form = e.target;
-    
-    const rawDate = document.getElementById('inputTanggal').value;
-    document.getElementById('formattedTanggalText').value = formatDateToIndonesian(rawDate);
+  function fetchJSONP(url) {
+    return new Promise((resolve, reject) => {
+      const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
+      window[callbackName] = function(data) {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        resolve(data);
+      };
 
-    const formData = new FormData(form);
-    const dataObj = {};
-    formData.forEach((value, key) => dataObj[key] = value);
-
-    const btn = document.getElementById('btnSubmit');
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...`;
-
-    try {
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'saveData', payload: dataObj })
-      });
-      const res = await response.json();
-
-      if (res.success) {
-        alert(res.message || "Data berhasil disimpan!");
-        form.reset();
-      } else {
-        alert(res.message || "Gagal menyimpan data.");
-      }
-    } catch (err) {
-      alert("Error: " + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = `<i class="bi bi-save me-1"></i> Simpan Data`;
-      loadTableData();
-    }
+      const script = document.createElement('script');
+      const delimiter = url.includes('?') ? '&' : '?';
+      script.src = `${url}${delimiter}callback=${callbackName}`;
+      script.onerror = () => {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        reject(new Error("Gagal terhubung ke Google Apps Script"));
+      };
+      document.body.appendChild(script);
+    });
   }
 
   async function loadTableData() {
@@ -248,8 +232,7 @@
     tbody.innerHTML = '<tr><td colspan="16" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>';
 
     try {
-      const response = await fetch(`${APPS_SCRIPT_URL}?action=getData`);
-      const data = await response.json();
+      const data = await fetchJSONP(`${APPS_SCRIPT_URL}?action=getData`);
       dataset = data || [];
       tbody.innerHTML = '';
 
@@ -304,6 +287,44 @@
     }
   }
 
+  async function handleFormSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    
+    const rawDate = document.getElementById('inputTanggal').value;
+    document.getElementById('formattedTanggalText').value = formatDateToIndonesian(rawDate);
+
+    const formData = new FormData(form);
+    const dataObj = {};
+    formData.forEach((value, key) => dataObj[key] = value);
+
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...`;
+
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'saveData', payload: dataObj })
+      });
+      const res = await response.json();
+
+      if (res.success) {
+        alert(res.message || "Data berhasil disimpan!");
+        form.reset();
+      } else {
+        alert(res.message || "Gagal menyimpan data.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="bi bi-save me-1"></i> Simpan Data`;
+      loadTableData();
+    }
+  }
+
   async function openSpdoModal(index) {
     selectedRowIndex = index;
     const rowData = dataset[index];
@@ -318,8 +339,7 @@
     spdoModalInstance.show();
 
     try {
-      const response = await fetch(`${APPS_SCRIPT_URL}?action=getSpdoList&jenis=${encodeURIComponent(jenis)}`);
-      const spdoList = await response.json();
+      const spdoList = await fetchJSONP(`${APPS_SCRIPT_URL}?action=getSpdoList&jenis=${encodeURIComponent(jenis)}`);
 
       loading.style.display = 'none';
       if (!spdoList || spdoList.length === 0) {
@@ -357,6 +377,7 @@
     try {
       const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'generatePDF', rowData, docId, name })
       });
       const res = await response.json();
@@ -389,6 +410,7 @@
     try {
       const response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'generatePDF', rowData, templateKey })
       });
       const res = await response.json();
