@@ -14,12 +14,15 @@
       max-height: 550px;
       overflow-x: auto;
       overflow-y: auto;
-      white-space: nowrap;
     }
     
     th, td {
       vertical-align: middle;
       font-size: 0.88rem;
+    }
+
+    tbody tr {
+      cursor: pointer;
     }
 
     .sticky-action {
@@ -33,11 +36,6 @@
     th.sticky-action {
       background-color: #cfe2ff !important;
       z-index: 3;
-    }
-
-    .list-group-item-action:hover {
-      background-color: #e9ecef;
-      cursor: pointer;
     }
 
     .filter-input {
@@ -75,12 +73,11 @@
         </div>
         <div class="col-md-3">
           <label class="form-label fw-semibold">TANGGAL</label>
-          <input type="date" class="form-control" id="inputTanggal" required>
-          <input type="hidden" name="TANGGAL_TEXT" id="formattedTanggalText">
+          <input type="date" class="form-control" name="TANGGAL" required>
         </div>
         <div class="col-md-3">
-          <label class="form-label fw-semibold">Tertuju</label>
-          <input type="text" class="form-control" name="tertuju">
+          <label class="form-label fw-semibold">TERTUJU</label>
+          <input type="text" class="form-control" name="TERTUJU">
         </div>
 
         <div class="col-md-3">
@@ -92,38 +89,42 @@
           <input type="text" class="form-control" name="HBL">
         </div>
         <div class="col-md-3">
-          <label class="form-label fw-semibold">Vessel</label>
-          <input type="text" class="form-control" name="Vessel">
+          <label class="form-label fw-semibold">VESSEL</label>
+          <input type="text" class="form-control" name="VESSEL">
         </div>
         <div class="col-md-3">
-          <label class="form-label fw-semibold">POL/POD</label>
-          <input type="text" class="form-control" name="POL_POD">
+          <label class="form-label fw-semibold">POL</label>
+          <input type="text" class="form-control" name="POL">
         </div>
 
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">POD</label>
+          <input type="text" class="form-control" name="POD">
+        </div>
         <div class="col-md-3">
           <label class="form-label fw-semibold">ASAL KOTA</label>
           <input type="text" class="form-control" name="ASAL_KOTA">
         </div>
         <div class="col-md-3">
           <label class="form-label fw-semibold">PACKAGES</label>
-          <input type="text" class="form-control" name="PACKAGES" placeholder="PALLETS/PACKAGES/.....">
+          <input type="text" class="form-control" name="PACKAGES" placeholder="PALLETS/PACKAGES">
         </div>
         <div class="col-md-3">
           <label class="form-label fw-semibold">QUANTITY</label>
-          <input type="text" class="form-control" name="QUANTITY" placeholder=".......... KGM">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">Container</label>
-          <input type="text" class="form-control" name="Container" placeholder="nX40 atau nX20 / nomor container; nomor container;......">
+          <input type="text" class="form-control" name="QUANTITY" placeholder="KGM">
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">CONTAINER</label>
+          <input type="text" class="form-control" name="CONTAINER">
+        </div>
+        <div class="col-md-4">
           <label class="form-label fw-semibold">CNEE</label>
           <input type="text" class="form-control" name="CNEE">
         </div>
-        <div class="col-md-6">
-          <label class="form-label fw-semibold">Staff</label>
-          <input type="text" class="form-control" name="staff">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">STAFF</label>
+          <input type="text" class="form-control" name="STAFF">
         </div>
       </div>
 
@@ -139,7 +140,7 @@
   <!-- SECTION 2: LIHAT DATA & PRINT -->
   <div class="card p-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="fw-bold text-secondary m-0"><i class="bi bi-table me-1"></i> Data Masuk & Cetak Document</h5>
+      <h5 class="fw-bold text-secondary m-0"><i class="bi bi-table me-1"></i> Data Masuk</h5>
       <!-- SEARCH BAR -->
       <div class="input-group style-search" style="max-width: 300px;">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
@@ -151,80 +152,36 @@
       <table class="table table-hover table-striped table-bordered align-middle" id="dataTable">
         <thead class="table-primary text-center">
           <tr>
-            <th>
-              NO
-              <input type="text" class="form-control filter-input" oninput="filterTable(0, this.value)">
-            </th>
-            <th>
+            <th style="width: 120px;">
               JENIS
-              <select class="form-select filter-input" onchange="filterTable(1, this.value)">
+              <select class="form-select filter-input" onchange="filterTable('JENIS', this.value)">
                 <option value="">Semua</option>
                 <option value="LCL">LCL</option>
                 <option value="FCL">FCL</option>
               </select>
             </th>
             <th>
-              NOMOR SURAT
-              <input type="text" class="form-control filter-input" oninput="filterTable(2, this.value)">
-            </th>
-            <th>
               TERTUJU
-              <input type="text" class="form-control filter-input" oninput="filterTable(3, this.value)">
+              <input type="text" class="form-control filter-input" oninput="filterTable('TERTUJU', this.value)">
             </th>
             <th>
               MBL
-              <input type="text" class="form-control filter-input" oninput="filterTable(4, this.value)">
+              <input type="text" class="form-control filter-input" oninput="filterTable('MBL', this.value)">
             </th>
             <th>
               HBL
-              <input type="text" class="form-control filter-input" oninput="filterTable(5, this.value)">
+              <input type="text" class="form-control filter-input" oninput="filterTable('HBL', this.value)">
             </th>
-            <th>
-              VESSEL
-              <input type="text" class="form-control filter-input" oninput="filterTable(6, this.value)">
-            </th>
-            <th>
-              POL/POD
-              <input type="text" class="form-control filter-input" oninput="filterTable(7, this.value)">
-            </th>
-            <th>
-              ASAL KOTA
-              <input type="text" class="form-control filter-input" oninput="filterTable(8, this.value)">
-            </th>
-            <th>
-              PACKAGES
-              <input type="text" class="form-control filter-input" oninput="filterTable(9, this.value)">
-            </th>
-            <th>
-              QUANTITY
-              <input type="text" class="form-control filter-input" oninput="filterTable(10, this.value)">
-            </th>
-            <th>
-              CONTAINER
-              <input type="text" class="form-control filter-input" oninput="filterTable(11, this.value)">
-            </th>
-            <th>
-              TANGGAL TEXT
-              <input type="text" class="form-control filter-input" oninput="filterTable(12, this.value)">
-            </th>
-            <th>
-              CNEE
-              <input type="text" class="form-control filter-input" oninput="filterTable(13, this.value)">
-            </th>
-            <th>
-              STAFF
-              <input type="text" class="form-control filter-input" oninput="filterTable(14, this.value)">
-            </th>
-            <th class="sticky-action">Aksi Print PDF</th>
+            <th class="sticky-action" style="width: 260px;">Aksi Print PDF</th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="16" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>
+          <tr><td colspan="5" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>
         </tbody>
       </table>
     </div>
 
-    <!-- PAGINATION (TAMPILAN 10 DATA) -->
+    <!-- PAGINATION -->
     <div class="d-flex justify-content-between align-items-center mt-3">
       <div id="pageInfo" class="small text-muted">Menampilkan 0 dari 0 data</div>
       <nav>
@@ -232,6 +189,120 @@
       </nav>
     </div>
 
+  </div>
+</div>
+
+<!-- MODAL DETAIL & EDIT DATA -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="detailModalLabel"><i class="bi bi-card-heading me-2"></i>Detail & Edit Data</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <input type="hidden" id="editRowIndex" name="rowIndex">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">ID</label>
+              <input type="text" class="form-control bg-light" id="editID" name="ID" readonly>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">NO</label>
+              <input type="text" class="form-control bg-light" id="editNO" name="NO" readonly>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">JENIS</label>
+              <select class="form-select" id="editJENIS" name="JENIS" required>
+                <option value="LCL">LCL</option>
+                <option value="FCL">FCL</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">TANGGAL</label>
+              <input type="date" class="form-control" id="editTANGGAL" name="TANGGAL">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">NOMOR SURAT</label>
+              <input type="number" class="form-control" id="editNOMOR_SURAT" name="NOMOR_SURAT">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">TERTUJU</label>
+              <input type="text" class="form-control" id="editTERTUJU" name="TERTUJU">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">MBL</label>
+              <input type="text" class="form-control" id="editMBL" name="MBL">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">HBL</label>
+              <input type="text" class="form-control" id="editHBL" name="HBL">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">VESSEL</label>
+              <input type="text" class="form-control" id="editVESSEL" name="VESSEL">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">POL</label>
+              <input type="text" class="form-control" id="editPOL" name="POL">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">POD</label>
+              <input type="text" class="form-control" id="editPOD" name="POD">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">ASAL KOTA</label>
+              <input type="text" class="form-control" id="editASAL_KOTA" name="ASAL_KOTA">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">PACKAGES</label>
+              <input type="text" class="form-control" id="editPACKAGES" name="PACKAGES">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">QUANTITY</label>
+              <input type="text" class="form-control" id="editQUANTITY" name="QUANTITY">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">CONTAINER</label>
+              <input type="text" class="form-control" id="editCONTAINER" name="CONTAINER">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">CNEE</label>
+              <input type="text" class="form-control" id="editCNEE" name="CNEE">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">STAFF</label>
+              <input type="text" class="form-control" id="editSTAFF" name="STAFF">
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">STATUS</label>
+              <input type="text" class="form-control" id="editSTATUS" name="STATUS">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-muted">CREATED AT / BY</label>
+              <div class="small text-secondary pt-2" id="infoCreated">-</div>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label fw-semibold small text-muted">UPDATED AT / BY</label>
+              <div class="small text-secondary pt-2" id="infoUpdated">-</div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        <button type="button" class="btn btn-success" id="btnUpdate" onclick="handleUpdateSubmit()">
+          <i class="bi bi-check-circle me-1"></i> Simpan Perubahan
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -255,8 +326,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT KAMU
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYOUR_DEPLOYMENT_ID/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzC0s1e5dv5gGCZwJaWL0wvRtBlMLX_d-HMmEe9asJOwW0Nv9aDDWlIUjOYUm2qbWon/exec";
 
   let dataset = [];
   let filteredData = [];
@@ -265,31 +335,18 @@
   let columnFilters = {};
 
   let selectedRowIndex = null;
+  let detailModalInstance = null;
   let spdoModalInstance = null;
 
   document.addEventListener('DOMContentLoaded', () => {
+    detailModalInstance = new bootstrap.Modal(document.getElementById('detailModal'));
     spdoModalInstance = new bootstrap.Modal(document.getElementById('spdoModal'));
     loadTableData();
   });
 
-  function formatDateToIndonesian(dateString) {
-    if (!dateString) return '';
-    const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-    ];
-    const parts = dateString.split('-');
-    if (parts.length !== 3) return dateString;
-    return `${parts[2]} ${months[parseInt(parts[1], 10) - 1]} ${parts[0]}`;
-  }
-
   async function handleFormSubmit(e) {
     e.preventDefault();
     const form = e.target;
-    
-    const rawDate = document.getElementById('inputTanggal').value;
-    document.getElementById('formattedTanggalText').value = formatDateToIndonesian(rawDate);
-
     const formData = new FormData(form);
     const dataObj = {};
     formData.forEach((value, key) => dataObj[key] = value);
@@ -320,9 +377,41 @@
     }
   }
 
+  async function handleUpdateSubmit() {
+    const form = document.getElementById('editForm');
+    const formData = new FormData(form);
+    const dataObj = {};
+    formData.forEach((value, key) => dataObj[key] = value);
+
+    const btn = document.getElementById('btnUpdate');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Updating...`;
+
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'updateData', payload: dataObj })
+      });
+      const res = await response.json();
+
+      if (res.success) {
+        alert(res.message || "Data berhasil diperbarui!");
+        detailModalInstance.hide();
+        loadTableData();
+      } else {
+        alert(res.message || "Gagal memperbarui data.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="bi bi-check-circle me-1"></i> Simpan Perubahan`;
+    }
+  }
+
   async function loadTableData() {
     const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = '<tr><td colspan="16" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>';
 
     try {
       const response = await fetch(`${APPS_SCRIPT_URL}?action=getData`);
@@ -332,7 +421,7 @@
       currentPage = 1;
       renderTable();
     } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="16" class="text-center text-danger py-4">Gagal memuat data: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat data: ${err.message}</td></tr>`;
     }
   }
 
@@ -341,21 +430,14 @@
     applyAllFilters(query);
   }
 
-  function filterTable(colIdx, value) {
-    columnFilters[colIdx] = value.toLowerCase().trim();
+  function filterTable(key, value) {
+    columnFilters[key] = value.toLowerCase().trim();
     const query = document.getElementById('searchInput').value.toLowerCase().trim();
     applyAllFilters(query);
   }
 
   function applyAllFilters(globalQuery) {
-    const colKeys = [
-      'NO', 'JENIS', 'NOMOR_SURAT', 'tertuju', 'MBL', 'HBL', 'Vessel', 
-      'POL_POD', 'ASAL_KOTA', 'PACKAGES', 'QUANTITY', 'Container', 
-      'TANGGAL_TEXT', 'CNEE', 'staff'
-    ];
-
     filteredData = dataset.filter(row => {
-      // Global search check
       if (globalQuery) {
         const matchesGlobal = Object.values(row).some(val => 
           String(val).toLowerCase().includes(globalQuery)
@@ -363,23 +445,11 @@
         if (!matchesGlobal) return false;
       }
 
-      // Column filters check
-      for (let colIdx in columnFilters) {
-        const filterVal = columnFilters[colIdx];
+      for (let key in columnFilters) {
+        const filterVal = columnFilters[key];
         if (!filterVal) continue;
-
-        const key = colKeys[colIdx];
-        let cellVal = '';
-        if (key === 'NOMOR_SURAT') cellVal = row['NOMOR_SURAT'] || row['NOMOR SURAT'] || '';
-        else if (key === 'POL_POD') cellVal = row['POL_POD'] || row['POL/POD'] || '';
-        else if (key === 'ASAL_KOTA') cellVal = row['ASAL_KOTA'] || row['ASAL KOTA'] || '';
-        else if (key === 'QUANTITY') cellVal = row['QUANTITY'] || row['QUANTITIY'] || '';
-        else if (key === 'TANGGAL_TEXT') cellVal = row['TANGGAL_TEXT'] || row['tangal TEXT'] || '';
-        else cellVal = row[key] || '';
-
-        if (!String(cellVal).toLowerCase().includes(filterVal)) {
-          return false;
-        }
+        const cellVal = row[key] || '';
+        if (!String(cellVal).toLowerCase().includes(filterVal)) return false;
       }
 
       return true;
@@ -394,7 +464,7 @@
     tbody.innerHTML = '';
 
     if (filteredData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="16" class="text-center py-4 text-muted">Tidak ada data ditemukan.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Tidak ada data ditemukan.</td></tr>';
       document.getElementById('pageInfo').innerText = 'Menampilkan 0 dari 0 data';
       document.getElementById('paginationControls').innerHTML = '';
       return;
@@ -421,33 +491,52 @@
          </button>`
       ).join('');
 
-      printButtons += `<button class="btn btn-sm btn-outline-warning m-1" onclick="openSpdoModal(${originalIdx})">
+      printButtons += `<button class="btn btn-sm btn-outline-warning m-1" onclick="openSpdoModal(${originalIdx}, event)">
         <i class="bi bi-file-earmark-text"></i> SPDO
       </button>`;
 
       tbody.innerHTML += `
-        <tr>
-          <td class="text-center fw-bold">${row['NO'] || '-'}</td>
+        <tr onclick="openDetailModal(${originalIdx})">
           <td class="text-center"><span class="badge ${jenis === 'FCL' ? 'bg-success' : 'bg-info'}">${jenis || '-'}</span></td>
-          <td class="text-center">${row['NOMOR_SURAT'] || row['NOMOR SURAT'] || '-'}</td>
-          <td>${row['tertuju'] || '-'}</td>
+          <td>${row['TERTUJU'] || '-'}</td>
           <td>${row['MBL'] || '-'}</td>
           <td>${row['HBL'] || '-'}</td>
-          <td>${row['Vessel'] || '-'}</td>
-          <td>${row['POL_POD'] || row['POL/POD'] || '-'}</td>
-          <td>${row['ASAL_KOTA'] || row['ASAL KOTA'] || '-'}</td>
-          <td>${row['PACKAGES'] || '-'}</td>
-          <td>${row['QUANTITY'] || row['QUANTITIY'] || '-'}</td>
-          <td>${row['Container'] || '-'}</td>
-          <td>${row['TANGGAL_TEXT'] || row['tangal TEXT'] || '-'}</td>
-          <td>${row['CNEE'] || '-'}</td>
-          <td>${row['staff'] || '-'}</td>
-          <td class="text-center sticky-action">${printButtons}</td>
+          <td class="text-center sticky-action" onclick="event.stopPropagation()">${printButtons}</td>
         </tr>
       `;
     });
 
     renderPagination();
+  }
+
+  function openDetailModal(index) {
+    const row = dataset[index];
+    if (!row) return;
+
+    document.getElementById('editRowIndex').value = row.rowIndex || '';
+    document.getElementById('editID').value = row['ID'] || '';
+    document.getElementById('editNO').value = row['NO'] || '';
+    document.getElementById('editJENIS').value = row['JENIS'] || 'LCL';
+    document.getElementById('editTANGGAL').value = row['TANGGAL'] || '';
+    document.getElementById('editNOMOR_SURAT').value = row['NOMOR_SURAT'] || '';
+    document.getElementById('editTERTUJU').value = row['TERTUJU'] || '';
+    document.getElementById('editMBL').value = row['MBL'] || '';
+    document.getElementById('editHBL').value = row['HBL'] || '';
+    document.getElementById('editVESSEL').value = row['VESSEL'] || '';
+    document.getElementById('editPOL').value = row['POL'] || '';
+    document.getElementById('editPOD').value = row['POD'] || '';
+    document.getElementById('editASAL_KOTA').value = row['ASAL_KOTA'] || '';
+    document.getElementById('editPACKAGES').value = row['PACKAGES'] || '';
+    document.getElementById('editQUANTITY').value = row['QUANTITY'] || '';
+    document.getElementById('editCONTAINER').value = row['CONTAINER'] || '';
+    document.getElementById('editCNEE').value = row['CNEE'] || '';
+    document.getElementById('editSTAFF').value = row['STAFF'] || '';
+    document.getElementById('editSTATUS').value = row['STATUS'] || 'ACTIVE';
+
+    document.getElementById('infoCreated').innerText = `${row['CREATED_AT'] || '-'} / ${row['CREATED_BY'] || '-'}`;
+    document.getElementById('infoUpdated').innerText = `${row['UPDATED_AT'] || '-'} / ${row['UPDATED_BY'] || '-'}`;
+
+    detailModalInstance.show();
   }
 
   function renderPagination() {
@@ -462,14 +551,12 @@
 
     if (totalPages <= 1) return;
 
-    // Previous Button
     paginationControls.innerHTML += `
       <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
         <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Prev</a>
       </li>
     `;
 
-    // Page numbers
     for (let i = 1; i <= totalPages; i++) {
       paginationControls.innerHTML += `
         <li class="page-item ${currentPage === i ? 'active' : ''}">
@@ -478,7 +565,6 @@
       `;
     }
 
-    // Next Button
     paginationControls.innerHTML += `
       <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
         <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Next</a>
@@ -493,7 +579,8 @@
     renderTable();
   }
 
-  async function openSpdoModal(index) {
+  async function openSpdoModal(index, evt) {
+    if (evt) evt.stopPropagation();
     selectedRowIndex = index;
     const rowData = dataset[index];
     if (!rowData) return;
@@ -567,6 +654,7 @@
   }
 
   async function printDoc(index, templateKey, evt) {
+    if (evt) evt.stopPropagation();
     const rowData = dataset[index];
     if (!rowData) return;
 
