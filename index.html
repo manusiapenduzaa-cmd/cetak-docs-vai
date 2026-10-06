@@ -39,6 +39,12 @@
       background-color: #e9ecef;
       cursor: pointer;
     }
+
+    .filter-input {
+      font-size: 0.75rem;
+      padding: 2px 5px;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -100,15 +106,15 @@
         </div>
         <div class="col-md-3">
           <label class="form-label fw-semibold">PACKAGES</label>
-          <input type="text" class="form-control" name="PACKAGES" placeholder="Teks">
+          <input type="text" class="form-control" name="PACKAGES" placeholder="PALLETS/PACKAGES/.....">
         </div>
         <div class="col-md-3">
           <label class="form-label fw-semibold">QUANTITY</label>
-          <input type="text" class="form-control" name="QUANTITY" placeholder="Teks">
+          <input type="text" class="form-control" name="QUANTITY" placeholder=".......... KGM">
         </div>
         <div class="col-md-3">
           <label class="form-label fw-semibold">Container</label>
-          <input type="text" class="form-control" name="Container">
+          <input type="text" class="form-control" name="Container" placeholder="nX40 atau nX20 / nomor container; nomor container;......">
         </div>
 
         <div class="col-md-6">
@@ -132,26 +138,83 @@
 
   <!-- SECTION 2: LIHAT DATA & PRINT -->
   <div class="card p-3">
-    <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-table me-1"></i> Data Masuk & Cetak Document</h5>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold text-secondary m-0"><i class="bi bi-table me-1"></i> Data Masuk & Cetak Document</h5>
+      <!-- SEARCH BAR -->
+      <div class="input-group style-search" style="max-width: 300px;">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Cari data..." oninput="handleSearch()">
+      </div>
+    </div>
+
     <div class="table-responsive">
       <table class="table table-hover table-striped table-bordered align-middle" id="dataTable">
         <thead class="table-primary text-center">
           <tr>
-            <th>NO</th>
-            <th>JENIS</th>
-            <th>NOMOR SURAT</th>
-            <th>TERTUJU</th>
-            <th>MBL</th>
-            <th>HBL</th>
-            <th>VESSEL</th>
-            <th>POL/POD</th>
-            <th>ASAL KOTA</th>
-            <th>PACKAGES</th>
-            <th>QUANTITY</th>
-            <th>CONTAINER</th>
-            <th>TANGGAL TEXT</th>
-            <th>CNEE</th>
-            <th>STAFF</th>
+            <th>
+              NO
+              <input type="text" class="form-control filter-input" oninput="filterTable(0, this.value)">
+            </th>
+            <th>
+              JENIS
+              <select class="form-select filter-input" onchange="filterTable(1, this.value)">
+                <option value="">Semua</option>
+                <option value="LCL">LCL</option>
+                <option value="FCL">FCL</option>
+              </select>
+            </th>
+            <th>
+              NOMOR SURAT
+              <input type="text" class="form-control filter-input" oninput="filterTable(2, this.value)">
+            </th>
+            <th>
+              TERTUJU
+              <input type="text" class="form-control filter-input" oninput="filterTable(3, this.value)">
+            </th>
+            <th>
+              MBL
+              <input type="text" class="form-control filter-input" oninput="filterTable(4, this.value)">
+            </th>
+            <th>
+              HBL
+              <input type="text" class="form-control filter-input" oninput="filterTable(5, this.value)">
+            </th>
+            <th>
+              VESSEL
+              <input type="text" class="form-control filter-input" oninput="filterTable(6, this.value)">
+            </th>
+            <th>
+              POL/POD
+              <input type="text" class="form-control filter-input" oninput="filterTable(7, this.value)">
+            </th>
+            <th>
+              ASAL KOTA
+              <input type="text" class="form-control filter-input" oninput="filterTable(8, this.value)">
+            </th>
+            <th>
+              PACKAGES
+              <input type="text" class="form-control filter-input" oninput="filterTable(9, this.value)">
+            </th>
+            <th>
+              QUANTITY
+              <input type="text" class="form-control filter-input" oninput="filterTable(10, this.value)">
+            </th>
+            <th>
+              CONTAINER
+              <input type="text" class="form-control filter-input" oninput="filterTable(11, this.value)">
+            </th>
+            <th>
+              TANGGAL TEXT
+              <input type="text" class="form-control filter-input" oninput="filterTable(12, this.value)">
+            </th>
+            <th>
+              CNEE
+              <input type="text" class="form-control filter-input" oninput="filterTable(13, this.value)">
+            </th>
+            <th>
+              STAFF
+              <input type="text" class="form-control filter-input" oninput="filterTable(14, this.value)">
+            </th>
             <th class="sticky-action">Aksi Print PDF</th>
           </tr>
         </thead>
@@ -160,6 +223,15 @@
         </tbody>
       </table>
     </div>
+
+    <!-- PAGINATION (TAMPILAN 10 DATA) -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div id="pageInfo" class="small text-muted">Menampilkan 0 dari 0 data</div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0" id="paginationControls"></ul>
+      </nav>
+    </div>
+
   </div>
 </div>
 
@@ -183,10 +255,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // GANTI URL DI BAWAL INI DENGAN URL WEB APP GOOGLE APPS SCRIPT KAMU
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdEDPJjMUUUQq1Xg6HUFr853sO1hniN3jXXzVyi463tHIbpTPoaxHzln2suVjNx7bv/exec";
+  // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT KAMU
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYOUR_DEPLOYMENT_ID/exec";
 
   let dataset = [];
+  let filteredData = [];
+  let currentPage = 1;
+  const rowsPerPage = 10;
+  let columnFilters = {};
+
   let selectedRowIndex = null;
   let spdoModalInstance = null;
 
@@ -251,57 +328,169 @@
       const response = await fetch(`${APPS_SCRIPT_URL}?action=getData`);
       const data = await response.json();
       dataset = data || [];
-      tbody.innerHTML = '';
-
-      if (dataset.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="16" class="text-center py-4 text-muted">Belum ada data di Spreadsheet.</td></tr>';
-        return;
-      }
-
-      dataset.forEach((row, idx) => {
-        const jenis = (row['JENIS'] || '').toUpperCase();
-        let options = [];
-
-        if (jenis === 'LCL') {
-          options = ['LCL TUGASS', 'LCL SKDO'];
-        } else if (jenis === 'FCL') {
-          options = ['FCL TUGAS', 'FCL SKDO'];
-        }
-
-        let printButtons = options.map(opt => 
-          `<button class="btn btn-sm btn-outline-primary m-1" onclick="printDoc(${idx}, '${opt}', event)">
-            <i class="bi bi-file-earmark-pdf"></i> ${opt}
-           </button>`
-        ).join('');
-
-        printButtons += `<button class="btn btn-sm btn-outline-warning m-1" onclick="openSpdoModal(${idx})">
-          <i class="bi bi-file-earmark-text"></i> SPDO
-        </button>`;
-
-        tbody.innerHTML += `
-          <tr>
-            <td class="text-center fw-bold">${row['NO'] || '-'}</td>
-            <td class="text-center"><span class="badge ${jenis === 'FCL' ? 'bg-success' : 'bg-info'}">${jenis || '-'}</span></td>
-            <td class="text-center">${row['NOMOR_SURAT'] || row['NOMOR SURAT'] || '-'}</td>
-            <td>${row['tertuju'] || '-'}</td>
-            <td>${row['MBL'] || '-'}</td>
-            <td>${row['HBL'] || '-'}</td>
-            <td>${row['Vessel'] || '-'}</td>
-            <td>${row['POL_POD'] || row['POL/POD'] || '-'}</td>
-            <td>${row['ASAL_KOTA'] || row['ASAL KOTA'] || '-'}</td>
-            <td>${row['PACKAGES'] || '-'}</td>
-            <td>${row['QUANTITY'] || row['QUANTITIY'] || '-'}</td>
-            <td>${row['Container'] || '-'}</td>
-            <td>${row['TANGGAL_TEXT'] || row['tangal TEXT'] || '-'}</td>
-            <td>${row['CNEE'] || '-'}</td>
-            <td>${row['staff'] || '-'}</td>
-            <td class="text-center sticky-action">${printButtons}</td>
-          </tr>
-        `;
-      });
+      filteredData = [...dataset];
+      currentPage = 1;
+      renderTable();
     } catch (err) {
       tbody.innerHTML = `<tr><td colspan="16" class="text-center text-danger py-4">Gagal memuat data: ${err.message}</td></tr>`;
     }
+  }
+
+  function handleSearch() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    applyAllFilters(query);
+  }
+
+  function filterTable(colIdx, value) {
+    columnFilters[colIdx] = value.toLowerCase().trim();
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    applyAllFilters(query);
+  }
+
+  function applyAllFilters(globalQuery) {
+    const colKeys = [
+      'NO', 'JENIS', 'NOMOR_SURAT', 'tertuju', 'MBL', 'HBL', 'Vessel', 
+      'POL_POD', 'ASAL_KOTA', 'PACKAGES', 'QUANTITY', 'Container', 
+      'TANGGAL_TEXT', 'CNEE', 'staff'
+    ];
+
+    filteredData = dataset.filter(row => {
+      // Global search check
+      if (globalQuery) {
+        const matchesGlobal = Object.values(row).some(val => 
+          String(val).toLowerCase().includes(globalQuery)
+        );
+        if (!matchesGlobal) return false;
+      }
+
+      // Column filters check
+      for (let colIdx in columnFilters) {
+        const filterVal = columnFilters[colIdx];
+        if (!filterVal) continue;
+
+        const key = colKeys[colIdx];
+        let cellVal = '';
+        if (key === 'NOMOR_SURAT') cellVal = row['NOMOR_SURAT'] || row['NOMOR SURAT'] || '';
+        else if (key === 'POL_POD') cellVal = row['POL_POD'] || row['POL/POD'] || '';
+        else if (key === 'ASAL_KOTA') cellVal = row['ASAL_KOTA'] || row['ASAL KOTA'] || '';
+        else if (key === 'QUANTITY') cellVal = row['QUANTITY'] || row['QUANTITIY'] || '';
+        else if (key === 'TANGGAL_TEXT') cellVal = row['TANGGAL_TEXT'] || row['tangal TEXT'] || '';
+        else cellVal = row[key] || '';
+
+        if (!String(cellVal).toLowerCase().includes(filterVal)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    currentPage = 1;
+    renderTable();
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    if (filteredData.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="16" class="text-center py-4 text-muted">Tidak ada data ditemukan.</td></tr>';
+      document.getElementById('pageInfo').innerText = 'Menampilkan 0 dari 0 data';
+      document.getElementById('paginationControls').innerHTML = '';
+      return;
+    }
+
+    const startIdx = (currentPage - 1) * rowsPerPage;
+    const endIdx = startIdx + rowsPerPage;
+    const pageData = filteredData.slice(startIdx, endIdx);
+
+    pageData.forEach((row) => {
+      const originalIdx = dataset.indexOf(row);
+      const jenis = (row['JENIS'] || '').toUpperCase();
+      let options = [];
+
+      if (jenis === 'LCL') {
+        options = ['LCL TUGASS', 'LCL SKDO'];
+      } else if (jenis === 'FCL') {
+        options = ['FCL TUGAS', 'FCL SKDO'];
+      }
+
+      let printButtons = options.map(opt => 
+        `<button class="btn btn-sm btn-outline-primary m-1" onclick="printDoc(${originalIdx}, '${opt}', event)">
+          <i class="bi bi-file-earmark-pdf"></i> ${opt}
+         </button>`
+      ).join('');
+
+      printButtons += `<button class="btn btn-sm btn-outline-warning m-1" onclick="openSpdoModal(${originalIdx})">
+        <i class="bi bi-file-earmark-text"></i> SPDO
+      </button>`;
+
+      tbody.innerHTML += `
+        <tr>
+          <td class="text-center fw-bold">${row['NO'] || '-'}</td>
+          <td class="text-center"><span class="badge ${jenis === 'FCL' ? 'bg-success' : 'bg-info'}">${jenis || '-'}</span></td>
+          <td class="text-center">${row['NOMOR_SURAT'] || row['NOMOR SURAT'] || '-'}</td>
+          <td>${row['tertuju'] || '-'}</td>
+          <td>${row['MBL'] || '-'}</td>
+          <td>${row['HBL'] || '-'}</td>
+          <td>${row['Vessel'] || '-'}</td>
+          <td>${row['POL_POD'] || row['POL/POD'] || '-'}</td>
+          <td>${row['ASAL_KOTA'] || row['ASAL KOTA'] || '-'}</td>
+          <td>${row['PACKAGES'] || '-'}</td>
+          <td>${row['QUANTITY'] || row['QUANTITIY'] || '-'}</td>
+          <td>${row['Container'] || '-'}</td>
+          <td>${row['TANGGAL_TEXT'] || row['tangal TEXT'] || '-'}</td>
+          <td>${row['CNEE'] || '-'}</td>
+          <td>${row['staff'] || '-'}</td>
+          <td class="text-center sticky-action">${printButtons}</td>
+        </tr>
+      `;
+    });
+
+    renderPagination();
+  }
+
+  function renderPagination() {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    const startCount = (currentPage - 1) * rowsPerPage + 1;
+    const endCount = Math.min(currentPage * rowsPerPage, filteredData.length);
+
+    document.getElementById('pageInfo').innerText = `Menampilkan ${startCount}-${endCount} dari ${filteredData.length} data`;
+
+    const paginationControls = document.getElementById('paginationControls');
+    paginationControls.innerHTML = '';
+
+    if (totalPages <= 1) return;
+
+    // Previous Button
+    paginationControls.innerHTML += `
+      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Prev</a>
+      </li>
+    `;
+
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+      paginationControls.innerHTML += `
+        <li class="page-item ${currentPage === i ? 'active' : ''}">
+          <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+        </li>
+      `;
+    }
+
+    // Next Button
+    paginationControls.innerHTML += `
+      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Next</a>
+      </li>
+    `;
+  }
+
+  function changePage(page) {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderTable();
   }
 
   async function openSpdoModal(index) {
