@@ -1,703 +1,428 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aplikasi Web Form & Mail Merge</title>
+  <base target="_top">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <style>
-    body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    
-    .table-responsive {
-      max-height: 550px;
-      overflow-x: auto;
-      overflow-y: auto;
-    }
-    
-    th, td {
-      vertical-align: middle;
-      font-size: 0.88rem;
-    }
-
-    tbody tr {
-      cursor: pointer;
-    }
-
-    .sticky-action {
-      position: sticky;
-      right: 0;
-      background-color: #ffffff !important;
-      box-shadow: -3px 0 6px rgba(0,0,0,0.08);
-      z-index: 2;
-    }
-
-    th.sticky-action {
-      background-color: #cfe2ff !important;
-      z-index: 3;
-    }
-
-    .filter-input {
-      font-size: 0.75rem;
-      padding: 2px 5px;
-      margin-top: 4px;
-    }
+    body { background-color: #f8f9fa; }
+    .card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .form-label { font-weight: 600; font-size: 0.875rem; color: #495057; }
+    .table-hover tbody tr { cursor: pointer; }
   </style>
 </head>
 <body>
+  <div class="container-fluid my-4 px-4" style="max-width: 95%;">
+    
+    <!-- CARD FORMULIR INPUT -->
+    <div class="card p-4 mb-4">
+      <h3 class="mb-4 text-center">Formulir Input Data Shipment</h3>
+      
+      <form id="shipmentForm" onsubmit="handleFormSubmit(this)">
+        <div class="row g-3">
+          
+          <div class="col-md-3">
+            <label class="form-label">JENIS</label>
+            <select name="jenis" id="jenisSelect" class="form-select" onchange="updateTertujuDropdown('jenisSelect', 'tertujuSelect')" required>
+              <option value="">-- Pilih --</option>
+              <option value="LCL">LCL</option>
+              <option value="FCL">FCL</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">TANGGAL</label>
+            <input type="date" name="tanggal" class="form-control" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">NOMOR SURAT</label>
+            <input type="text" name="nomor_surat" class="form-control" placeholder="Contoh: 2020">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">TERTUJU</label>
+            <select name="tertuju" id="tertujuSelect" class="form-select" required disabled>
+              <option value="">-- Memuat Data... --</option>
+            </select>
+          </div>
 
-<div class="container-fluid px-4 py-4">
-  <!-- HEADER -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold text-primary"><i class="bi bi-file-earmark-text me-2"></i>Web Form & Database Mail Merge</h3>
-    <button class="btn btn-outline-secondary btn-sm" onclick="loadTableData()"><i class="bi bi-arrow-clockwise"></i> Refresh Data</button>
-  </div>
+          <div class="col-md-3">
+            <label class="form-label">MBL</label>
+            <input type="text" name="mbl" class="form-control">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">HBL</label>
+            <input type="text" name="hbl" class="form-control">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">VESSEL</label>
+            <input type="text" name="vessel" class="form-control" placeholder="Contoh: EVER BLINK / 1207-084B">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">POL</label>
+            <input type="text" name="pol" class="form-control" placeholder="Contoh: SHENZHEN">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">POD</label>
+            <input type="text" name="pod" class="form-control" placeholder="Contoh: JAKARTA">
+          </div>
 
-  <!-- SECTION 1: FORM INPUT DATA -->
-  <div class="card p-4 mb-4">
-    <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-plus-circle me-1"></i> Input Data Baru</h5>
-    <form id="dataForm" onsubmit="handleFormSubmit(event)">
-      <div class="row g-3">
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">JENIS <span class="text-danger">*</span></label>
-          <select class="form-select" name="JENIS" required>
-            <option value="">-- Pilih Jenis --</option>
-            <option value="LCL">LCL</option>
-            <option value="FCL">FCL</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">NOMOR SURAT</label>
-          <input type="number" class="form-control" name="NOMOR_SURAT" placeholder="Angka">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">TANGGAL</label>
-          <input type="date" class="form-control" name="TANGGAL" required>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">TERTUJU</label>
-          <input type="text" class="form-control" name="TERTUJU">
-        </div>
+          <div class="col-md-3">
+            <label class="form-label">ASAL KOTA</label>
+            <input type="text" name="asal_kota" class="form-control" placeholder="Contoh: Shenzhen, China">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">PACKAGES</label>
+            <input type="text" name="packages" class="form-control" placeholder="Contoh: 292.2600 KGM">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">QUANTITY</label>
+            <input type="text" name="quantity" class="form-control" placeholder="Contoh: 3 PALLETS/PACKAGES/...">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">CONTAINER</label>
+            <input type="text" name="container" class="form-control" placeholder="Contoh: 4X40HC / XXXXXXXXXXX;XXXXXXXXXXX">
+          </div>
 
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">MBL</label>
-          <input type="text" class="form-control" name="MBL">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">HBL</label>
-          <input type="text" class="form-control" name="HBL">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">VESSEL</label>
-          <input type="text" class="form-control" name="VESSEL">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">POL</label>
-          <input type="text" class="form-control" name="POL">
-        </div>
+          <div class="col-md-6">
+            <label class="form-label">CNEE (Consignee)</label>
+            <input type="text" name="cnee" class="form-control" placeholder="Nama Perusahaan / Penerima" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">STAFF</label>
+            <input type="text" name="staff" class="form-control" placeholder="Nama Staff Penanggung Jawab">
+          </div>
 
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">POD</label>
-          <input type="text" class="form-control" name="POD">
+          <div class="col-12 mt-4">
+            <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-2">Kirim Data</button>
+          </div>
         </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">ASAL KOTA</label>
-          <input type="text" class="form-control" name="ASAL_KOTA">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">PACKAGES</label>
-          <input type="text" class="form-control" name="PACKAGES" placeholder="PALLETS/PACKAGES">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">QUANTITY</label>
-          <input type="text" class="form-control" name="QUANTITY" placeholder="KGM">
-        </div>
+      </form>
 
-        <div class="col-md-4">
-          <label class="form-label fw-semibold">CONTAINER</label>
-          <input type="text" class="form-control" name="CONTAINER">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label fw-semibold">CNEE</label>
-          <input type="text" class="form-control" name="CNEE">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label fw-semibold">STAFF</label>
-          <input type="text" class="form-control" name="STAFF">
-        </div>
+      <div id="alertBox" class="mt-3" style="display: none;"></div>
+    </div>
+
+    <!-- CARD TABEL DATA -->
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="m-0">Daftar Data Shipment</h4>
+        <button class="btn btn-sm btn-outline-secondary" onclick="loadTableData()">Refresh Tabel</button>
       </div>
-
-      <div class="mt-4 text-end">
-        <button type="reset" class="btn btn-light me-2">Reset</button>
-        <button type="submit" class="btn btn-primary" id="btnSubmit">
-          <i class="bi bi-save me-1"></i> Simpan Data
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <!-- SECTION 2: LIHAT DATA & PRINT -->
-  <div class="card p-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="fw-bold text-secondary m-0"><i class="bi bi-table me-1"></i> Data Masuk</h5>
-      <!-- SEARCH BAR -->
-      <div class="input-group style-search" style="max-width: 300px;">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" id="searchInput" class="form-control" placeholder="Cari data..." oninput="handleSearch()">
+      <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered align-middle m-0">
+          <thead class="table-dark text-center">
+            <tr>
+              <th style="width: 80px;">NO</th>
+              <th style="width: 100px;">JENIS</th>
+              <th>TERTUJU</th>
+              <th>MBL</th>
+              <th>HBL</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="5" class="text-center py-3">Memuat data tabel...</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div class="table-responsive">
-      <table class="table table-hover table-striped table-bordered align-middle" id="dataTable">
-        <thead class="table-primary text-center">
-          <tr>
-            <th style="width: 120px;">
-              JENIS
-              <select class="form-select filter-input" onchange="filterTable('JENIS', this.value)">
-                <option value="">Semua</option>
-                <option value="LCL">LCL</option>
-                <option value="FCL">FCL</option>
-              </select>
-            </th>
-            <th>
-              TERTUJU
-              <input type="text" class="form-control filter-input" oninput="filterTable('TERTUJU', this.value)">
-            </th>
-            <th>
-              MBL
-              <input type="text" class="form-control filter-input" oninput="filterTable('MBL', this.value)">
-            </th>
-            <th>
-              HBL
-              <input type="text" class="form-control filter-input" oninput="filterTable('HBL', this.value)">
-            </th>
-            <th class="sticky-action" style="width: 260px;">Aksi Print PDF</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <tr><td colspan="5" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- PAGINATION -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <div id="pageInfo" class="small text-muted">Menampilkan 0 dari 0 data</div>
-      <nav>
-        <ul class="pagination pagination-sm mb-0" id="paginationControls"></ul>
-      </nav>
-    </div>
-
   </div>
-</div>
 
-<!-- MODAL DETAIL & EDIT DATA -->
-<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="detailModalLabel"><i class="bi bi-card-heading me-2"></i>Detail & Edit Data</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="editForm">
-          <input type="hidden" id="editRowIndex" name="rowIndex">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">ID</label>
-              <input type="text" class="form-control bg-light" id="editID" name="ID" readonly>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">NO</label>
-              <input type="text" class="form-control bg-light" id="editNO" name="NO" readonly>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">JENIS</label>
-              <select class="form-select" id="editJENIS" name="JENIS" required>
-                <option value="LCL">LCL</option>
-                <option value="FCL">FCL</option>
-              </select>
-            </div>
+  <!-- MODAL DETAIL & EDIT -->
+  <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Detail & Edit Shipment</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editForm" onsubmit="handleEditSubmit(this)">
+          <div class="modal-body">
+            <input type="hidden" name="rowIndex" id="editRowIndex">
+            
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">JENIS</label>
+                <select name="jenis" id="editJenisSelect" class="form-select" onchange="updateTertujuDropdown('editJenisSelect', 'editTertujuSelect')" required disabled>
+                  <option value="LCL">LCL</option>
+                  <option value="FCL">FCL</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">TANGGAL</label>
+                <input type="date" name="tanggal" id="editTanggal" class="form-control" required readonly>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">NOMOR SURAT</label>
+                <input type="text" name="nomor_surat" id="editNomorSurat" class="form-control" readonly>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">TERTUJU</label>
+                <select name="tertuju" id="editTertujuSelect" class="form-select" required disabled>
+                </select>
+              </div>
 
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">TANGGAL</label>
-              <input type="date" class="form-control" id="editTANGGAL" name="TANGGAL">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">NOMOR SURAT</label>
-              <input type="number" class="form-control" id="editNOMOR_SURAT" name="NOMOR_SURAT">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">TERTUJU</label>
-              <input type="text" class="form-control" id="editTERTUJU" name="TERTUJU">
-            </div>
+              <div class="col-md-3">
+                <label class="form-label">MBL</label>
+                <input type="text" name="mbl" id="editMbl" class="form-control" readonly>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">HBL</label>
+                <input type="text" name="hbl" id="editHbl" class="form-control" readonly>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">VESSEL</label>
+                <input type="text" name="vessel" id="editVessel" class="form-control" readonly>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">POL</label>
+                <input type="text" name="pol" id="editPol" class="form-control" readonly>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">POD</label>
+                <input type="text" name="pod" id="editPod" class="form-control" readonly>
+              </div>
 
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">MBL</label>
-              <input type="text" class="form-control" id="editMBL" name="MBL">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">HBL</label>
-              <input type="text" class="form-control" id="editHBL" name="HBL">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">VESSEL</label>
-              <input type="text" class="form-control" id="editVESSEL" name="VESSEL">
-            </div>
+              <div class="col-md-3">
+                <label class="form-label">ASAL KOTA</label>
+                <input type="text" name="asal_kota" id="editAsalKota" class="form-control" readonly>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">PACKAGES</label>
+                <input type="text" name="packages" id="editPackages" class="form-control" readonly>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">QUANTITY</label>
+                <input type="text" name="quantity" id="editQuantity" class="form-control" readonly>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">CONTAINER</label>
+                <input type="text" name="container" id="editContainer" class="form-control" readonly>
+              </div>
 
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">POL</label>
-              <input type="text" class="form-control" id="editPOL" name="POL">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">POD</label>
-              <input type="text" class="form-control" id="editPOD" name="POD">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">ASAL KOTA</label>
-              <input type="text" class="form-control" id="editASAL_KOTA" name="ASAL_KOTA">
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">PACKAGES</label>
-              <input type="text" class="form-control" id="editPACKAGES" name="PACKAGES">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">QUANTITY</label>
-              <input type="text" class="form-control" id="editQUANTITY" name="QUANTITY">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">CONTAINER</label>
-              <input type="text" class="form-control" id="editCONTAINER" name="CONTAINER">
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">CNEE</label>
-              <input type="text" class="form-control" id="editCNEE" name="CNEE">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">STAFF</label>
-              <input type="text" class="form-control" id="editSTAFF" name="STAFF">
+              <div class="col-md-6">
+                <label class="form-label">CNEE (Consignee)</label>
+                <input type="text" name="cnee" id="editCnee" class="form-control" required readonly>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">STAFF</label>
+                <input type="text" name="staff" id="editStaff" class="form-control" readonly>
+              </div>
             </div>
 
-            <div class="col-md-3">
-              <label class="form-label fw-semibold">STATUS</label>
-              <input type="text" class="form-control" id="editSTATUS" name="STATUS">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-semibold small text-muted">CREATED AT / BY</label>
-              <div class="small text-secondary pt-2" id="infoCreated">-</div>
-            </div>
-            <div class="col-md-5">
-              <label class="form-label fw-semibold small text-muted">UPDATED AT / BY</label>
-              <div class="small text-secondary pt-2" id="infoUpdated">-</div>
-            </div>
+            <div id="modalAlert" class="mt-3" style="display: none;"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="editBtn" class="btn btn-warning" onclick="enableEditMode()">Edit</button>
+            <button type="submit" id="saveBtn" class="btn btn-success" style="display: none;">Simpan</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
           </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-        <button type="button" class="btn btn-success" id="btnUpdate" onclick="handleUpdateSubmit()">
-          <i class="bi bi-check-circle me-1"></i> Simpan Perubahan
-        </button>
-      </div>
     </div>
   </div>
-</div>
 
-<!-- MODAL LIST SPDO -->
-<div class="modal fade" id="spdoModal" tabindex="-1" aria-labelledby="spdoModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="spdoModalLabel"><i class="bi bi-file-earmark-pdf me-2"></i>Pilih Template SPDO</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body p-0">
-        <div id="spdoLoading" class="text-center py-4 text-muted">
-          <span class="spinner-border spinner-border-sm me-2"></span> Mengambil daftar SPDO...
-        </div>
-        <div class="list-group list-group-flush" id="spdoContainer"></div>
-      </div>
-    </div>
-  </div>
-</div>
+  <script>
+    var optionsData = { lcl: [], fcl: [] };
+    var isDataLoaded = false;
+    var tableDataStore = [];
+    var detailModalObj;
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzC0s1e5dv5gGCZwJaWL0wvRtBlMLX_d-HMmEe9asJOwW0Nv9aDDWlIUjOYUm2qbWon/exec";
+    window.onload = function() {
+      detailModalObj = new bootstrap.Modal(document.getElementById('detailModal'));
 
-  let dataset = [];
-  let filteredData = [];
-  let currentPage = 1;
-  const rowsPerPage = 10;
-  let columnFilters = {};
+      google.script.run
+        .withSuccessHandler(function(data) {
+          optionsData = data;
+          isDataLoaded = true;
+          var tertujuSelect = document.getElementById("tertujuSelect");
+          tertujuSelect.innerHTML = '<option value="">-- Pilih Jenis Dulu --</option>';
+        })
+        .getOptionsList();
 
-  let selectedRowIndex = null;
-  let detailModalInstance = null;
-  let spdoModalInstance = null;
-
-  document.addEventListener('DOMContentLoaded', () => {
-    detailModalInstance = new bootstrap.Modal(document.getElementById('detailModal'));
-    spdoModalInstance = new bootstrap.Modal(document.getElementById('spdoModal'));
-    loadTableData();
-  });
-
-  async function handleFormSubmit(e) {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const dataObj = {};
-    formData.forEach((value, key) => dataObj[key] = value);
-
-    const btn = document.getElementById('btnSubmit');
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...`;
-
-    try {
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'saveData', payload: dataObj })
-      });
-      const res = await response.json();
-
-      if (res.success) {
-        alert(res.message || "Data berhasil disimpan!");
-        form.reset();
-      } else {
-        alert(res.message || "Gagal menyimpan data.");
-      }
-    } catch (err) {
-      alert("Error: " + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = `<i class="bi bi-save me-1"></i> Simpan Data`;
       loadTableData();
-    }
-  }
+    };
 
-  async function handleUpdateSubmit() {
-    const form = document.getElementById('editForm');
-    const formData = new FormData(form);
-    const dataObj = {};
-    formData.forEach((value, key) => dataObj[key] = value);
+    function loadTableData() {
+      var tbody = document.getElementById("tableBody");
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3">Memuat data tabel...</td></tr>';
 
-    const btn = document.getElementById('btnUpdate');
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Updating...`;
+      google.script.run
+        .withSuccessHandler(function(data) {
+          tableDataStore = data;
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3">Belum ada data.</td></tr>';
+            return;
+          }
 
-    try {
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'updateData', payload: dataObj })
-      });
-      const res = await response.json();
-
-      if (res.success) {
-        alert(res.message || "Data berhasil diperbarui!");
-        detailModalInstance.hide();
-        loadTableData();
-      } else {
-        alert(res.message || "Gagal memperbarui data.");
-      }
-    } catch (err) {
-      alert("Error: " + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = `<i class="bi bi-check-circle me-1"></i> Simpan Perubahan`;
-    }
-  }
-
-  async function loadTableData() {
-    const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>';
-
-    try {
-      const response = await fetch(`${APPS_SCRIPT_URL}?action=getData`);
-      const data = await response.json();
-      dataset = data || [];
-      filteredData = [...dataset];
-      currentPage = 1;
-      renderTable();
-    } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat data: ${err.message}</td></tr>`;
-    }
-  }
-
-  function handleSearch() {
-    const query = document.getElementById('searchInput').value.toLowerCase().trim();
-    applyAllFilters(query);
-  }
-
-  function filterTable(key, value) {
-    columnFilters[key] = value.toLowerCase().trim();
-    const query = document.getElementById('searchInput').value.toLowerCase().trim();
-    applyAllFilters(query);
-  }
-
-  function applyAllFilters(globalQuery) {
-    filteredData = dataset.filter(row => {
-      if (globalQuery) {
-        const matchesGlobal = Object.values(row).some(val => 
-          String(val).toLowerCase().includes(globalQuery)
-        );
-        if (!matchesGlobal) return false;
-      }
-
-      for (let key in columnFilters) {
-        const filterVal = columnFilters[key];
-        if (!filterVal) continue;
-        const cellVal = row[key] || '';
-        if (!String(cellVal).toLowerCase().includes(filterVal)) return false;
-      }
-
-      return true;
-    });
-
-    currentPage = 1;
-    renderTable();
-  }
-
-  function renderTable() {
-    const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = '';
-
-    if (filteredData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Tidak ada data ditemukan.</td></tr>';
-      document.getElementById('pageInfo').innerText = 'Menampilkan 0 dari 0 data';
-      document.getElementById('paginationControls').innerHTML = '';
-      return;
+          var html = "";
+          data.forEach(function(row, idx) {
+            html += '<tr onclick="openModalDetail(' + idx + ')">';
+            html += '<td class="text-center">' + (row.no || "-") + '</td>';
+            html += '<td class="text-center"><span class="badge ' + (row.jenis === 'LCL' ? 'bg-info' : 'bg-success') + '">' + (row.jenis || "-") + '</span></td>';
+            html += '<td>' + (row.tertuju || "-") + '</td>';
+            html += '<td>' + (row.mbl || "-") + '</td>';
+            html += '<td>' + (row.hbl || "-") + '</td>';
+            html += '</tr>';
+          });
+          tbody.innerHTML = html;
+        })
+        .getTableData();
     }
 
-    const startIdx = (currentPage - 1) * rowsPerPage;
-    const endIdx = startIdx + rowsPerPage;
-    const pageData = filteredData.slice(startIdx, endIdx);
+    function updateTertujuDropdown(jenisSelectId, tertujuSelectId, selectedValue) {
+      var jenis = document.getElementById(jenisSelectId).value;
+      var tertujuSelect = document.getElementById(tertujuSelectId);
 
-    pageData.forEach((row) => {
-      const originalIdx = dataset.indexOf(row);
-      const jenis = (row['JENIS'] || '').toUpperCase();
-      let options = [];
-
-      if (jenis === 'LCL') {
-        options = ['LCL TUGASS', 'LCL SKDO'];
-      } else if (jenis === 'FCL') {
-        options = ['FCL TUGAS', 'FCL SKDO'];
-      }
-
-      let printButtons = options.map(opt => 
-        `<button class="btn btn-sm btn-outline-primary m-1" onclick="printDoc(${originalIdx}, '${opt}', event)">
-          <i class="bi bi-file-earmark-pdf"></i> ${opt}
-         </button>`
-      ).join('');
-
-      printButtons += `<button class="btn btn-sm btn-outline-warning m-1" onclick="openSpdoModal(${originalIdx}, event)">
-        <i class="bi bi-file-earmark-text"></i> SPDO
-      </button>`;
-
-      tbody.innerHTML += `
-        <tr onclick="openDetailModal(${originalIdx})">
-          <td class="text-center"><span class="badge ${jenis === 'FCL' ? 'bg-success' : 'bg-info'}">${jenis || '-'}</span></td>
-          <td>${row['TERTUJU'] || '-'}</td>
-          <td>${row['MBL'] || '-'}</td>
-          <td>${row['HBL'] || '-'}</td>
-          <td class="text-center sticky-action" onclick="event.stopPropagation()">${printButtons}</td>
-        </tr>
-      `;
-    });
-
-    renderPagination();
-  }
-
-  function openDetailModal(index) {
-    const row = dataset[index];
-    if (!row) return;
-
-    document.getElementById('editRowIndex').value = row.rowIndex || '';
-    document.getElementById('editID').value = row['ID'] || '';
-    document.getElementById('editNO').value = row['NO'] || '';
-    document.getElementById('editJENIS').value = row['JENIS'] || 'LCL';
-    document.getElementById('editTANGGAL').value = row['TANGGAL'] || '';
-    document.getElementById('editNOMOR_SURAT').value = row['NOMOR_SURAT'] || '';
-    document.getElementById('editTERTUJU').value = row['TERTUJU'] || '';
-    document.getElementById('editMBL').value = row['MBL'] || '';
-    document.getElementById('editHBL').value = row['HBL'] || '';
-    document.getElementById('editVESSEL').value = row['VESSEL'] || '';
-    document.getElementById('editPOL').value = row['POL'] || '';
-    document.getElementById('editPOD').value = row['POD'] || '';
-    document.getElementById('editASAL_KOTA').value = row['ASAL_KOTA'] || '';
-    document.getElementById('editPACKAGES').value = row['PACKAGES'] || '';
-    document.getElementById('editQUANTITY').value = row['QUANTITY'] || '';
-    document.getElementById('editCONTAINER').value = row['CONTAINER'] || '';
-    document.getElementById('editCNEE').value = row['CNEE'] || '';
-    document.getElementById('editSTAFF').value = row['STAFF'] || '';
-    document.getElementById('editSTATUS').value = row['STATUS'] || 'ACTIVE';
-
-    document.getElementById('infoCreated').innerText = `${row['CREATED_AT'] || '-'} / ${row['CREATED_BY'] || '-'}`;
-    document.getElementById('infoUpdated').innerText = `${row['UPDATED_AT'] || '-'} / ${row['UPDATED_BY'] || '-'}`;
-
-    detailModalInstance.show();
-  }
-
-  function renderPagination() {
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-    const startCount = (currentPage - 1) * rowsPerPage + 1;
-    const endCount = Math.min(currentPage * rowsPerPage, filteredData.length);
-
-    document.getElementById('pageInfo').innerText = `Menampilkan ${startCount}-${endCount} dari ${filteredData.length} data`;
-
-    const paginationControls = document.getElementById('paginationControls');
-    paginationControls.innerHTML = '';
-
-    if (totalPages <= 1) return;
-
-    paginationControls.innerHTML += `
-      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-        <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Prev</a>
-      </li>
-    `;
-
-    for (let i = 1; i <= totalPages; i++) {
-      paginationControls.innerHTML += `
-        <li class="page-item ${currentPage === i ? 'active' : ''}">
-          <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
-        </li>
-      `;
-    }
-
-    paginationControls.innerHTML += `
-      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-        <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Next</a>
-      </li>
-    `;
-  }
-
-  function changePage(page) {
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-    if (page < 1 || page > totalPages) return;
-    currentPage = page;
-    renderTable();
-  }
-
-  async function openSpdoModal(index, evt) {
-    if (evt) evt.stopPropagation();
-    selectedRowIndex = index;
-    const rowData = dataset[index];
-    if (!rowData) return;
-
-    const jenis = rowData['JENIS'];
-    const container = document.getElementById('spdoContainer');
-    const loading = document.getElementById('spdoLoading');
-
-    container.innerHTML = '';
-    loading.style.display = 'block';
-    spdoModalInstance.show();
-
-    try {
-      const response = await fetch(`${APPS_SCRIPT_URL}?action=getSpdoList&jenis=${encodeURIComponent(jenis)}`);
-      const spdoList = await response.json();
-
-      loading.style.display = 'none';
-      if (!spdoList || spdoList.length === 0) {
-        container.innerHTML = '<div class="p-3 text-center text-muted">Tidak ada template SPDO yang ditemukan.</div>';
+      if (!isDataLoaded) {
+        tertujuSelect.disabled = true;
+        tertujuSelect.innerHTML = '<option value="">-- Sedang Memuat Data... --</option>';
         return;
       }
 
-      spdoList.forEach(item => {
-        const btn = document.createElement('button');
-        btn.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3';
-        btn.innerHTML = `
-          <div>
-            <i class="bi bi-file-earmark-word text-primary me-2 fs-5"></i>
-            <span class="fw-semibold">${item.name}</span>
-          </div>
-          <i class="bi bi-download text-secondary"></i>
-        `;
-        btn.onclick = (e) => printSpdoDoc(item.docId, item.name, e.currentTarget);
-        container.appendChild(btn);
-      });
-    } catch (err) {
-      loading.style.display = 'none';
-      container.innerHTML = `<div class="p-3 text-center text-danger">Gagal memuat SPDO: ${err.message}</div>`;
-    }
-  }
+      tertujuSelect.innerHTML = '<option value="">-- Pilih Tertuju --</option>';
+      var list = (jenis === "LCL") ? optionsData.lcl : (jenis === "FCL") ? optionsData.fcl : [];
 
-  async function printSpdoDoc(docId, name, btnElement) {
-    const rowData = dataset[selectedRowIndex];
-    if (!rowData) return;
-
-    const oldHtml = btnElement.innerHTML;
-    btnElement.style.pointerEvents = 'none';
-    btnElement.innerHTML = `<div><span class="spinner-border spinner-border-sm text-primary me-2"></span>Memproses PDF...</div>`;
-
-    try {
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'generatePDF', rowData, docId, name })
-      });
-      const res = await response.json();
-
-      btnElement.style.pointerEvents = 'auto';
-      btnElement.innerHTML = oldHtml;
-
-      if (res.success) {
-        spdoModalInstance.hide();
-        downloadPdfBase64(res.pdfBase64, res.fileName);
+      if (list.length > 0) {
+        tertujuSelect.disabled = document.getElementById(jenisSelectId).disabled;
+        list.forEach(function(item) {
+          var opt = document.createElement("option");
+          opt.value = item;
+          opt.textContent = item;
+          if (selectedValue && selectedValue === item) {
+            opt.selected = true;
+          }
+          tertujuSelect.appendChild(opt);
+        });
       } else {
-        alert('Gagal membuat PDF SPDO: ' + res.error);
+        tertujuSelect.disabled = true;
+        tertujuSelect.innerHTML = '<option value="">-- Pilih Jenis Dulu --</option>';
       }
-    } catch (err) {
-      btnElement.style.pointerEvents = 'auto';
-      btnElement.innerHTML = oldHtml;
-      alert('Error: ' + err.message);
     }
-  }
 
-  async function printDoc(index, templateKey, evt) {
-    if (evt) evt.stopPropagation();
-    const rowData = dataset[index];
-    if (!rowData) return;
+    function openModalDetail(index) {
+      var data = tableDataStore[index];
+      if (!data) return;
 
-    const btn = evt.currentTarget;
-    const oldHtml = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Process...`;
+      document.getElementById("editRowIndex").value = data.rowIndex;
+      document.getElementById("editJenisSelect").value = data.jenis;
+      document.getElementById("editTanggal").value = data.tanggal;
+      document.getElementById("editNomorSurat").value = data.nomor_surat;
+      document.getElementById("editMbl").value = data.mbl;
+      document.getElementById("editHbl").value = data.hbl;
+      document.getElementById("editVessel").value = data.vessel;
+      document.getElementById("editPol").value = data.pol;
+      document.getElementById("editPod").value = data.pod;
+      document.getElementById("editAsalKota").value = data.asal_kota;
+      document.getElementById("editPackages").value = data.packages;
+      document.getElementById("editQuantity").value = data.quantity;
+      document.getElementById("editContainer").value = data.container;
+      document.getElementById("editCnee").value = data.cnee;
+      document.getElementById("editStaff").value = data.staff;
 
-    try {
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'generatePDF', rowData, templateKey })
+      updateTertujuDropdown('editJenisSelect', 'editTertujuSelect', data.tertuju);
+
+      disableEditMode();
+      document.getElementById("modalAlert").style.display = 'none';
+      detailModalObj.show();
+    }
+
+    function enableEditMode() {
+      var inputs = document.querySelectorAll("#editForm input, #editForm select");
+      inputs.forEach(function(input) {
+        input.removeAttribute("readonly");
+        input.removeAttribute("disabled");
       });
-      const res = await response.json();
 
-      btn.disabled = false;
-      btn.innerHTML = oldHtml;
-
-      if (res.success) {
-        downloadPdfBase64(res.pdfBase64, res.fileName);
-      } else {
-        alert('Gagal membuat PDF: ' + res.error);
-      }
-    } catch (err) {
-      btn.disabled = false;
-      btn.innerHTML = oldHtml;
-      alert('Error: ' + err.message);
+      document.getElementById("editBtn").style.display = 'none';
+      document.getElementById("saveBtn").style.display = 'inline-block';
     }
-  }
 
-  function downloadPdfBase64(base64Data, fileName) {
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    function disableEditMode() {
+      var inputs = document.querySelectorAll("#editForm input, #editForm select");
+      inputs.forEach(function(input) {
+        input.setAttribute("readonly", true);
+        if (input.tagName === "SELECT") {
+          input.setAttribute("disabled", true);
+        }
+      });
+
+      document.getElementById("editBtn").style.display = 'inline-block';
+      document.getElementById("saveBtn").style.display = 'none';
     }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: 'application/pdf' });
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = fileName;
-    link.click();
-  }
-</script>
+
+    function handleFormSubmit(formObject) {
+      event.preventDefault();
+      var btn = document.getElementById("submitBtn");
+      var alertBox = document.getElementById("alertBox");
+      
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...';
+      alertBox.style.display = 'none';
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          btn.disabled = false;
+          btn.innerHTML = 'Kirim Data';
+          
+          if (response.status === "success") {
+            alertBox.className = "alert alert-success mt-3";
+            alertBox.innerHTML = response.message;
+            alertBox.style.display = 'block';
+            formObject.reset();
+            updateTertujuDropdown('jenisSelect', 'tertujuSelect');
+            loadTableData();
+          } else {
+            alertBox.className = "alert alert-danger mt-3";
+            alertBox.innerHTML = "Gagal: " + response.message;
+            alertBox.style.display = 'block';
+          }
+        })
+        .withFailureHandler(function(error) {
+          btn.disabled = false;
+          btn.innerHTML = 'Kirim Data';
+          alertBox.className = "alert alert-danger mt-3";
+          alertBox.innerHTML = "Error Sistem: " + error.message;
+          alertBox.style.display = 'block';
+        })
+        .processForm(formObject);
+    }
+
+    function handleEditSubmit(formObject) {
+      event.preventDefault();
+      var saveBtn = document.getElementById("saveBtn");
+      var modalAlert = document.getElementById("modalAlert");
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memperbarui...';
+      modalAlert.style.display = 'none';
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = 'Simpan';
+
+          if (response.status === "success") {
+            modalAlert.className = "alert alert-success";
+            modalAlert.innerHTML = response.message;
+            modalAlert.style.display = 'block';
+            disableEditMode();
+            loadTableData();
+          } else {
+            modalAlert.className = "alert alert-danger";
+            modalAlert.innerHTML = "Gagal: " + response.message;
+            modalAlert.style.display = 'block';
+          }
+        })
+        .withFailureHandler(function(error) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = 'Simpan';
+          modalAlert.className = "alert alert-danger";
+          modalAlert.innerHTML = "Error: " + error.message;
+          modalAlert.style.display = 'block';
+        })
+        .updateForm(formObject);
+    }
+  </script>
 </body>
 </html>
