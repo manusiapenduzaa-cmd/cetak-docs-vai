@@ -1,258 +1,426 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ngupit - Database Document</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<style>
-body{background:#f5f7fb;font-family:"Segoe UI",Tahoma,sans-serif}
-.card{border:0;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
-.page-title{font-weight:700;color:#173b68}
-.table-responsive{max-height:570px;overflow:auto}
-th,td{vertical-align:middle;font-size:.82rem}
-thead th{position:sticky;top:0;z-index:4;white-space:nowrap}
-.sticky-action{position:sticky;right:0;background:#fff!important;box-shadow:-3px 0 7px rgba(0,0,0,.08);z-index:5}
-thead .sticky-action{background:#cfe2ff!important}
-.stat-card{min-height:92px}.stat-number{font-size:1.55rem;font-weight:700}
-.btn-doc{font-size:.72rem;margin:2px}.small-muted{font-size:.78rem;color:#6c757d}
-.mobile-card{display:none}
-#apiStatus{font-size:.75rem}
-@media(max-width:768px){
- .container-fluid{padding:12px!important}.topbar{gap:10px;align-items:flex-start!important;flex-direction:column}
- .search-wrap{width:100%!important;max-width:none!important}.desktop-table{display:none}.mobile-card{display:block}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Web Form & Mail Merge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    
+    .table-responsive {
+      max-height: 550px;
+      overflow-x: auto;
+      overflow-y: auto;
+      white-space: nowrap;
+    }
+    
+    th, td {
+      vertical-align: middle;
+      font-size: 0.88rem;
+    }
+
+    .sticky-action {
+      position: sticky;
+      right: 0;
+      background-color: #ffffff !important;
+      box-shadow: -3px 0 6px rgba(0,0,0,0.08);
+      z-index: 2;
+    }
+
+    th.sticky-action {
+      background-color: #cfe2ff !important;
+      z-index: 3;
+    }
+
+    .list-group-item-action:hover {
+      background-color: #e9ecef;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+
 <div class="container-fluid px-4 py-4">
-  <div class="d-flex justify-content-between topbar mb-3">
-    <div>
-      <h3 class="page-title mb-1"><i class="bi bi-file-earmark-text me-2"></i>Ngupit Document Management</h3>
-      <div class="small-muted">Database, Mail Merge, TUGAS, SKDO & SPDO</div>
-    </div>
-    <div class="d-flex gap-2 align-items-center">
-      <span id="apiStatus" class="badge bg-secondary">Connecting...</span>
-      <button class="btn btn-outline-secondary btn-sm" onclick="loadDashboard()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
-    </div>
+  <!-- HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-primary"><i class="bi bi-file-earmark-text me-2"></i>Web Form & Database Mail Merge</h3>
+    <button class="btn btn-outline-secondary btn-sm" onclick="loadTableData()"><i class="bi bi-arrow-clockwise"></i> Refresh Data</button>
   </div>
 
-  <div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3"><div class="card p-3 stat-card"><div class="small-muted">TOTAL</div><div class="stat-number" id="statTotal">-</div></div></div>
-    <div class="col-6 col-lg-3"><div class="card p-3 stat-card"><div class="small-muted">FCL</div><div class="stat-number text-success" id="statFcl">-</div></div></div>
-    <div class="col-6 col-lg-3"><div class="card p-3 stat-card"><div class="small-muted">LCL</div><div class="stat-number text-info" id="statLcl">-</div></div></div>
-    <div class="col-6 col-lg-3"><div class="card p-3 stat-card"><div class="small-muted">READY</div><div class="stat-number text-primary" id="statReady">-</div></div></div>
-  </div>
-
+  <!-- SECTION 1: FORM INPUT DATA -->
   <div class="card p-4 mb-4">
     <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-plus-circle me-1"></i> Input Data Baru</h5>
     <form id="dataForm" onsubmit="handleFormSubmit(event)">
       <div class="row g-3">
-        <div class="col-md-3"><label class="form-label fw-semibold">JENIS *</label><select class="form-select" name="JENIS" required><option value="">-- Pilih Jenis --</option><option>FCL</option><option>LCL</option></select></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">NOMOR SURAT</label><input class="form-control" name="NOMOR_SURAT"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">TANGGAL *</label><input type="date" class="form-control" name="TANGGAL" required></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">STATUS</label><select class="form-select" name="STATUS"><option>DRAFT</option><option>READY</option><option>PRINTED</option><option>SENT</option><option>CANCELLED</option></select></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">TERTUJU</label><input class="form-control" name="TERTUJU"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">MBL</label><input class="form-control" name="MBL"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">HBL</label><input class="form-control" name="HBL"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">VESSEL</label><input class="form-control" name="VESSEL"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">POL</label><input class="form-control" name="POL"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">POD</label><input class="form-control" name="POD"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">ASAL KOTA</label><input class="form-control" name="ASAL_KOTA"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">PACKAGES</label><input class="form-control" name="PACKAGES" placeholder="PALLETS / PACKAGES"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">QUANTITY</label><input class="form-control" name="QUANTITY" placeholder="KGM"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">CONTAINER</label><input class="form-control" name="CONTAINER" placeholder="1X40HQ / ABCU1234567"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">ALAMAT</label><input class="form-control" name="ALAMAT"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">CNEE</label><input class="form-control" name="CNEE"></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">STAFF</label><input class="form-control" name="STAFF"></div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">JENIS <span class="text-danger">*</span></label>
+          <select class="form-select" name="JENIS" required>
+            <option value="">-- Pilih Jenis --</option>
+            <option value="LCL">LCL</option>
+            <option value="FCL">FCL</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">NOMOR SURAT</label>
+          <input type="number" class="form-control" name="NOMOR_SURAT" placeholder="Angka">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">TANGGAL</label>
+          <input type="date" class="form-control" id="inputTanggal" required>
+          <input type="hidden" name="TANGGAL_TEXT" id="formattedTanggalText">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Tertuju</label>
+          <input type="text" class="form-control" name="tertuju">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">MBL</label>
+          <input type="text" class="form-control" name="MBL">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">HBL</label>
+          <input type="text" class="form-control" name="HBL">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Vessel</label>
+          <input type="text" class="form-control" name="Vessel">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">POL/POD</label>
+          <input type="text" class="form-control" name="POL_POD">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">ASAL KOTA</label>
+          <input type="text" class="form-control" name="ASAL_KOTA">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">PACKAGES</label>
+          <input type="text" class="form-control" name="PACKAGES" placeholder="Teks">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">QUANTITY</label>
+          <input type="text" class="form-control" name="QUANTITY" placeholder="Teks">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Container</label>
+          <input type="text" class="form-control" name="Container">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">CNEE</label>
+          <input type="text" class="form-control" name="CNEE">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Staff</label>
+          <input type="text" class="form-control" name="staff">
+        </div>
       </div>
-      <div class="mt-4 text-end"><button type="reset" class="btn btn-light me-2">Reset</button><button class="btn btn-primary" id="btnSubmit"><i class="bi bi-save me-1"></i>Simpan Data</button></div>
+
+      <div class="mt-4 text-end">
+        <button type="reset" class="btn btn-light me-2">Reset</button>
+        <button type="submit" class="btn btn-primary" id="btnSubmit">
+          <i class="bi bi-save me-1"></i> Simpan Data
+        </button>
+      </div>
     </form>
   </div>
 
+  <!-- SECTION 2: LIHAT DATA & PRINT -->
   <div class="card p-3">
-    <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
-      <div><h5 class="fw-bold text-secondary m-0"><i class="bi bi-table me-1"></i>Database Document</h5><div class="small-muted">Search & pagination dilakukan di server.</div></div>
-      <div class="input-group search-wrap" style="max-width:470px">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input id="searchInput" class="form-control" placeholder="Cari MBL, HBL, CNEE, vessel, nomor surat..." onkeydown="if(event.key==='Enter')loadData(1)">
-        <select id="jenisFilter" class="form-select" style="max-width:120px" onchange="loadData(1)"><option value="">Semua</option><option>FCL</option><option>LCL</option></select>
-        <button class="btn btn-primary" onclick="loadData(1)">Cari</button>
-      </div>
-    </div>
-
-    <div class="table-responsive desktop-table">
-      <table class="table table-hover table-striped table-bordered align-middle mb-0">
+    <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-table me-1"></i> Data Masuk & Cetak Document</h5>
+    <div class="table-responsive">
+      <table class="table table-hover table-striped table-bordered align-middle" id="dataTable">
         <thead class="table-primary text-center">
           <tr>
-            <th>NO</th><th>JENIS</th><th>TANGGAL</th><th>NOMOR SURAT</th><th>TERTUUJU</th><th>MBL</th><th>HBL</th><th>VESSEL</th><th>POL</th><th>POD</th><th>ASAL KOTA</th><th>PACKAGES</th><th>QUANTITY</th><th>CONTAINER</th><th>ALAMAT</th><th>CNEE</th><th>STAFF</th><th>STATUS</th><th class="sticky-action">AKSI</th>
+            <th>NO</th>
+            <th>JENIS</th>
+            <th>NOMOR SURAT</th>
+            <th>TERTUJU</th>
+            <th>MBL</th>
+            <th>HBL</th>
+            <th>VESSEL</th>
+            <th>POL/POD</th>
+            <th>ASAL KOTA</th>
+            <th>PACKAGES</th>
+            <th>QUANTITY</th>
+            <th>CONTAINER</th>
+            <th>TANGGAL TEXT</th>
+            <th>CNEE</th>
+            <th>STAFF</th>
+            <th class="sticky-action">Aksi Print PDF</th>
           </tr>
         </thead>
-        <tbody id="tableBody"><tr><td colspan="19" class="text-center py-4">Menghubungkan ke database...</td></tr></tbody>
+        <tbody id="tableBody">
+          <tr><td colspan="16" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>
+        </tbody>
       </table>
-    </div>
-    <div id="mobileContainer" class="mobile-card"></div>
-
-    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-      <div id="pageInfo" class="small-muted">-</div><nav><ul class="pagination pagination-sm mb-0" id="paginationControls"></ul></nav>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="spdoModal" tabindex="-1"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content">
-<div class="modal-header bg-primary text-white"><h5 class="modal-title">Pilih Template SPDO</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-<div class="modal-body p-0"><div id="spdoLoading" class="text-center py-4">Mengambil daftar SPDO...</div><div id="spdoContainer" class="list-group list-group-flush"></div></div>
-</div></div></div>
+<!-- MODAL LIST SPDO -->
+<div class="modal fade" id="spdoModal" tabindex="-1" aria-labelledby="spdoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="spdoModalLabel"><i class="bi bi-file-earmark-pdf me-2"></i>Pilih Template SPDO</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div id="spdoLoading" class="text-center py-4 text-muted">
+          <span class="spinner-border spinner-border-sm me-2"></span> Mengambil daftar SPDO...
+        </div>
+        <div class="list-group list-group-flush" id="spdoContainer"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<div class="modal fade" id="editModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
-<div class="modal-header"><h5 class="modal-title">Edit Document</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-<div class="modal-body"><form id="editForm"></form></div>
-<div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button class="btn btn-primary" onclick="saveEdit()">Simpan Perubahan</button></div>
-</div></div></div>
-
-<script>
-const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbznn2NDNQ-JM5qV380N4DcxrFMoItIftNeJu-VaLb_7n2peGeysF7_c3B74afbA5OVP/exec";
-const LIMIT=10;
-let currentPage=1,currentRow=null,spdoModal,editModal;
-
-document.addEventListener("DOMContentLoaded",()=>{
- spdoModal=new bootstrap.Modal(document.getElementById("spdoModal"));
- editModal=new bootstrap.Modal(document.getElementById("editModal"));
- loadDashboard();
-});
-
-function jsonp(action,params={}) {
- return new Promise((resolve,reject)=>{
-   const cb="ngupit_cb_"+Date.now()+"_"+Math.floor(Math.random()*100000);
-   const script=document.createElement("script");
-   const url=new URL(APPS_SCRIPT_URL);
-   url.searchParams.set("action",action); url.searchParams.set("callback",cb);
-   Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,String(v??"")));
-   let done=false;
-   const cleanup=()=>{if(script.parentNode)script.parentNode.removeChild(script);try{delete window[cb]}catch(e){}};
-   const timer=setTimeout(()=>{if(done)return;done=true;cleanup();reject(new Error("Timeout: Web App tidak memberikan respons dalam 20 detik."));},20000);
-   window[cb]=(data)=>{if(done)return;done=true;clearTimeout(timer);cleanup();resolve(data)};
-   script.onerror=()=>{if(done)return;done=true;clearTimeout(timer);cleanup();reject(new Error("Tidak dapat mengakses Web App. Cek deployment Web App dan URL APPS_SCRIPT_URL."));};
-   document.head.appendChild(script);
- });
-}
-
-async function loadDashboard(){
- try{
-   const s=await jsonp("getStats");
-   if(!s||s.success===false)throw new Error(s?.error||s?.message||"getStats gagal");
-   document.getElementById("statTotal").textContent=s.total??0;
-   document.getElementById("statFcl").textContent=s.fcl??0;
-   document.getElementById("statLcl").textContent=s.lcl??0;
-   document.getElementById("statReady").textContent=s.ready??0;
-   setApiStatus(true,"Connected");
-   await loadData(1);
- }catch(err){setApiStatus(false,"API ERROR");showTableError(err.message);console.error(err);}
-}
-
-async function loadData(page=1){
- currentPage=page; showLoading();
- try{
-   const r=await jsonp("getData",{page,limit:LIMIT,q:document.getElementById("searchInput").value.trim(),jenis:document.getElementById("jenisFilter").value});
-   if(!r||r.success===false)throw new Error(r?.error||r?.message||"getData gagal");
-   renderTable(r.data||[]);renderPagination(r.total||0,r.page||page,r.limit||LIMIT);
-   setApiStatus(true,"Connected");
- }catch(err){showTableError(err.message);setApiStatus(false,"API ERROR");console.error(err);}
-}
-
-function showLoading(){document.getElementById("tableBody").innerHTML='<tr><td colspan="19" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>';document.getElementById("mobileContainer").innerHTML="";}
-function showTableError(msg){document.getElementById("tableBody").innerHTML=`<tr><td colspan="19" class="text-center text-danger py-4"><b>Gagal memuat data</b><br>${e(msg)}<br><small>Cek URL Web App, deployment, dan fungsi doGet().</small></td></tr>`;}
-function setApiStatus(ok,text){const el=document.getElementById("apiStatus");el.textContent=text;el.className="badge "+(ok?"bg-success":"bg-danger");}
-
-function renderTable(rows){
- if(!rows.length){document.getElementById("tableBody").innerHTML='<tr><td colspan="19" class="text-center text-muted py-4">Tidak ada data.</td></tr>';document.getElementById("mobileContainer").innerHTML='<div class="text-center text-muted py-4">Tidak ada data.</div>';return;}
- document.getElementById("tableBody").innerHTML=rows.map(r=>`<tr>
- <td class="fw-bold">${e(r.NO)}</td><td>${jenisBadge(r.JENIS)}</td><td>${e(r.TANGGAL)}</td><td>${e(r.NOMOR_SURAT)}</td><td>${e(r.TERTUJU)}</td>
- <td>${e(r.MBL)}</td><td>${e(r.HBL)}</td><td>${e(r.VESSEL)}</td><td>${e(r.POL)}</td><td>${e(r.POD)}</td><td>${e(r.ASAL_KOTA)}</td>
- <td>${e(r.PACKAGES)}</td><td>${e(r.QUANTITY)}</td><td>${e(r.CONTAINER)}</td><td>${e(r.ALAMAT)}</td><td>${e(r.CNEE)}</td><td>${e(r.STAFF)}</td><td>${statusBadge(r.STATUS)}</td>
- <td class="text-center sticky-action">${actions(r)}</td></tr>`).join("");
- document.getElementById("mobileContainer").innerHTML=rows.map(r=>`<div class="card p-3"><div class="d-flex justify-content-between"><strong>${e(r.NO)} - ${e(r.JENIS)}</strong>${statusBadge(r.STATUS)}</div>
- <div class="small mt-2"><b>MBL:</b> ${e(r.MBL)} &nbsp; <b>HBL:</b> ${e(r.HBL)}</div><div class="small"><b>Vessel:</b> ${e(r.VESSEL)}</div>
- <div class="small"><b>CNEE:</b> ${e(r.CNEE)}</div><div class="small"><b>Alamat:</b> ${e(r.ALAMAT)}</div><div class="small"><b>Tanggal:</b> ${e(r.TANGGAL)}</div>
- <div class="mt-2">${actions(r)}</div></div>`).join("");
-}
-
-function actions(r){
- const k=String(r.JENIS||"").toUpperCase(), arr=k==="LCL"?["LCL TUGASS","LCL SKDO"]:["FCL TUGAS","FCL SKDO"];
- return arr.map(t=>`<button class="btn btn-sm btn-outline-primary btn-doc" onclick='printDoc(${JSON.stringify(r)},${JSON.stringify(t)},this)'>${e(t)}</button>`).join("")
- +`<button class="btn btn-sm btn-outline-warning btn-doc" onclick='openSpdo(${JSON.stringify(r)})'>SPDO</button>`
- +`<button class="btn btn-sm btn-outline-secondary btn-doc" onclick='openEdit(${JSON.stringify(r)})'>Edit</button>`;
-}
-
-function renderPagination(total,page,limit){
- const pages=Math.max(1,Math.ceil(total/limit)),start=total?(page-1)*limit+1:0,end=Math.min(page*limit,total);
- document.getElementById("pageInfo").textContent=`Menampilkan ${start}-${end} dari ${total} data`;
- let h=`<li class="page-item ${page<=1?"disabled":""}"><a class="page-link" href="#" onclick="loadData(${page-1});return false">Prev</a></li>`;
- const from=Math.max(1,page-2),to=Math.min(pages,page+2);
- for(let i=from;i<=to;i++)h+=`<li class="page-item ${i===page?"active":""}"><a class="page-link" href="#" onclick="loadData(${i});return false">${i}</a></li>`;
- h+=`<li class="page-item ${page>=pages?"disabled":""}"><a class="page-link" href="#" onclick="loadData(${page+1});return false">Next</a></li>`;
- document.getElementById("paginationControls").innerHTML=h;
-}
-
-async function handleFormSubmit(ev){
- ev.preventDefault();const btn=document.getElementById("btnSubmit"),data=Object.fromEntries(new FormData(ev.target).entries());
- btn.disabled=true;btn.innerHTML="Menyimpan...";
- try{
-  const r=await jsonp("saveData",{payload:JSON.stringify(data)});
-  if(!r?.success)throw new Error(r?.message||r?.error||"Gagal menyimpan");
-  alert("Data berhasil disimpan.\nID: "+r.id);ev.target.reset();await loadDashboard();
- }catch(err){alert("Gagal menyimpan: "+err.message)}finally{btn.disabled=false;btn.innerHTML='<i class="bi bi-save me-1"></i>Simpan Data';}
-}
-
-async function printDoc(row,template,btn){
- const old=btn.innerHTML;btn.disabled=true;btn.innerHTML="Process...";
- try{
-  const r=await jsonp("generatePDF",{id:row.ID,templateKey:template});
-  if(!r?.success)throw new Error(r?.error||"Generate PDF gagal");
-  downloadPdfBase64(r.pdfBase64,r.fileName);await jsonp("updateStatus",{id:row.ID,status:"PRINTED"});loadDashboard();
- }catch(err){alert("Gagal membuat PDF: "+err.message)}finally{btn.disabled=false;btn.innerHTML=old;}
-}
-
-async function openSpdo(row){
- currentRow=row;document.getElementById("spdoContainer").innerHTML="";document.getElementById("spdoLoading").style.display="block";spdoModal.show();
- try{
-  const list=await jsonp("getSpdoList",{jenis:row.JENIS});document.getElementById("spdoLoading").style.display="none";
-  if(!list.length){document.getElementById("spdoContainer").innerHTML='<div class="p-3 text-center text-muted">Tidak ada template SPDO.</div>';return;}
-  list.forEach(item=>{const b=document.createElement("button");b.className="list-group-item list-group-item-action d-flex justify-content-between py-3";b.innerHTML=`<span><i class="bi bi-file-earmark-word text-primary me-2"></i>${e(item.name)}</span><i class="bi bi-download"></i>`;b.onclick=()=>printSpdo(row,item,b);document.getElementById("spdoContainer").appendChild(b);});
- }catch(err){document.getElementById("spdoLoading").style.display="none";document.getElementById("spdoContainer").innerHTML=`<div class="p-3 text-danger">${e(err.message)}</div>`;}
-}
-
-async function printSpdo(row,item,btn){
- const old=btn.innerHTML;btn.disabled=true;btn.innerHTML="Memproses PDF...";
- try{
-  const r=await jsonp("generatePDF",{id:row.ID,docId:item.docId,name:item.name});
-  if(!r?.success)throw new Error(r?.error||"Generate PDF gagal");downloadPdfBase64(r.pdfBase64,r.fileName);spdoModal.hide();await jsonp("updateStatus",{id:row.ID,status:"PRINTED"});loadDashboard();
- }catch(err){alert("Gagal membuat PDF: "+err.message)}finally{btn.disabled=false;btn.innerHTML=old;}
-}
-
-function openEdit(row){
- currentRow=row;
- const fields=["JENIS","TANGGAL","NOMOR_SURAT","TERTUUJU","TERTUJU","MBL","HBL","VESSEL","POL","POD","ASAL_KOTA","PACKAGES","QUANTITY","CONTAINER","ALAMAT","CNEE","STAFF","STATUS"];
- const unique=[...new Set(fields)];
- document.getElementById("editForm").innerHTML=unique.map(f=>`<div class="mb-3"><label class="form-label fw-semibold">${e(f)}</label><input class="form-control" id="edit_${f}" type="${f==="TANGGAL"?"date":"text"}" value="${attr(row[f]||"")}"></div>`).join("");
- editModal.show();
-}
-async function saveEdit(){
- const fields=["JENIS","TANGGAL","NOMOR_SURAT","TERTUJU","MBL","HBL","VESSEL","POL","POD","ASAL_KOTA","PACKAGES","QUANTITY","CONTAINER","ALAMAT","CNEE","STAFF","STATUS"],p={ID:currentRow.ID};
- fields.forEach(f=>p[f]=document.getElementById("edit_"+f).value);
- try{const r=await jsonp("updateData",{payload:JSON.stringify(p)});if(!r?.success)throw new Error(r?.message||r?.error);editModal.hide();alert("Data berhasil diperbarui.");loadDashboard()}catch(err){alert("Gagal update: "+err.message)}
-}
-
-function downloadPdfBase64(b64,name){
- const bytes=atob(b64),arr=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)arr[i]=bytes.charCodeAt(i);
- const blob=new Blob([arr],{type:"application/pdf"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
-}
-function jenisBadge(x){return `<span class="badge ${String(x).toUpperCase()==="FCL"?"bg-success":"bg-info"}">${e(x)}</span>`}
-function statusBadge(x){const s=String(x||"DRAFT").toUpperCase(),c={DRAFT:"bg-secondary",READY:"bg-primary",PRINTED:"bg-success",SENT:"bg-info",CANCELLED:"bg-danger"}[s]||"bg-secondary";return `<span class="badge ${c}">${e(s)}</span>`}
-function e(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function attr(v){return e(v).replace(/"/g,"&quot;")}
-</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // GANTI URL DI BAWAL INI DENGAN URL WEB APP GOOGLE APPS SCRIPT KAMU
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYOUR_DEPLOYMENT_ID/exec";
+
+  let dataset = [];
+  let selectedRowIndex = null;
+  let spdoModalInstance = null;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    spdoModalInstance = new bootstrap.Modal(document.getElementById('spdoModal'));
+    loadTableData();
+  });
+
+  function formatDateToIndonesian(dateString) {
+    if (!dateString) return '';
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    const parts = dateString.split('-');
+    if (parts.length !== 3) return dateString;
+    return `${parts[2]} ${months[parseInt(parts[1], 10) - 1]} ${parts[0]}`;
+  }
+
+  async function handleFormSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    
+    const rawDate = document.getElementById('inputTanggal').value;
+    document.getElementById('formattedTanggalText').value = formatDateToIndonesian(rawDate);
+
+    const formData = new FormData(form);
+    const dataObj = {};
+    formData.forEach((value, key) => dataObj[key] = value);
+
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...`;
+
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'saveData', payload: dataObj })
+      });
+      const res = await response.json();
+
+      if (res.success) {
+        alert(res.message || "Data berhasil disimpan!");
+        form.reset();
+      } else {
+        alert(res.message || "Gagal menyimpan data.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="bi bi-save me-1"></i> Simpan Data`;
+      loadTableData();
+    }
+  }
+
+  async function loadTableData() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '<tr><td colspan="16" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Memuat data...</td></tr>';
+
+    try {
+      const response = await fetch(`${APPS_SCRIPT_URL}?action=getData`);
+      const data = await response.json();
+      dataset = data || [];
+      tbody.innerHTML = '';
+
+      if (dataset.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="16" class="text-center py-4 text-muted">Belum ada data di Spreadsheet.</td></tr>';
+        return;
+      }
+
+      dataset.forEach((row, idx) => {
+        const jenis = (row['JENIS'] || '').toUpperCase();
+        let options = [];
+
+        if (jenis === 'LCL') {
+          options = ['LCL TUGASS', 'LCL SKDO'];
+        } else if (jenis === 'FCL') {
+          options = ['FCL TUGAS', 'FCL SKDO'];
+        }
+
+        let printButtons = options.map(opt => 
+          `<button class="btn btn-sm btn-outline-primary m-1" onclick="printDoc(${idx}, '${opt}', event)">
+            <i class="bi bi-file-earmark-pdf"></i> ${opt}
+           </button>`
+        ).join('');
+
+        printButtons += `<button class="btn btn-sm btn-outline-warning m-1" onclick="openSpdoModal(${idx})">
+          <i class="bi bi-file-earmark-text"></i> SPDO
+        </button>`;
+
+        tbody.innerHTML += `
+          <tr>
+            <td class="text-center fw-bold">${row['NO'] || '-'}</td>
+            <td class="text-center"><span class="badge ${jenis === 'FCL' ? 'bg-success' : 'bg-info'}">${jenis || '-'}</span></td>
+            <td class="text-center">${row['NOMOR_SURAT'] || row['NOMOR SURAT'] || '-'}</td>
+            <td>${row['tertuju'] || '-'}</td>
+            <td>${row['MBL'] || '-'}</td>
+            <td>${row['HBL'] || '-'}</td>
+            <td>${row['Vessel'] || '-'}</td>
+            <td>${row['POL_POD'] || row['POL/POD'] || '-'}</td>
+            <td>${row['ASAL_KOTA'] || row['ASAL KOTA'] || '-'}</td>
+            <td>${row['PACKAGES'] || '-'}</td>
+            <td>${row['QUANTITY'] || row['QUANTITIY'] || '-'}</td>
+            <td>${row['Container'] || '-'}</td>
+            <td>${row['TANGGAL_TEXT'] || row['tangal TEXT'] || '-'}</td>
+            <td>${row['CNEE'] || '-'}</td>
+            <td>${row['staff'] || '-'}</td>
+            <td class="text-center sticky-action">${printButtons}</td>
+          </tr>
+        `;
+      });
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="16" class="text-center text-danger py-4">Gagal memuat data: ${err.message}</td></tr>`;
+    }
+  }
+
+  async function openSpdoModal(index) {
+    selectedRowIndex = index;
+    const rowData = dataset[index];
+    if (!rowData) return;
+
+    const jenis = rowData['JENIS'];
+    const container = document.getElementById('spdoContainer');
+    const loading = document.getElementById('spdoLoading');
+
+    container.innerHTML = '';
+    loading.style.display = 'block';
+    spdoModalInstance.show();
+
+    try {
+      const response = await fetch(`${APPS_SCRIPT_URL}?action=getSpdoList&jenis=${encodeURIComponent(jenis)}`);
+      const spdoList = await response.json();
+
+      loading.style.display = 'none';
+      if (!spdoList || spdoList.length === 0) {
+        container.innerHTML = '<div class="p-3 text-center text-muted">Tidak ada template SPDO yang ditemukan.</div>';
+        return;
+      }
+
+      spdoList.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3';
+        btn.innerHTML = `
+          <div>
+            <i class="bi bi-file-earmark-word text-primary me-2 fs-5"></i>
+            <span class="fw-semibold">${item.name}</span>
+          </div>
+          <i class="bi bi-download text-secondary"></i>
+        `;
+        btn.onclick = (e) => printSpdoDoc(item.docId, item.name, e.currentTarget);
+        container.appendChild(btn);
+      });
+    } catch (err) {
+      loading.style.display = 'none';
+      container.innerHTML = `<div class="p-3 text-center text-danger">Gagal memuat SPDO: ${err.message}</div>`;
+    }
+  }
+
+  async function printSpdoDoc(docId, name, btnElement) {
+    const rowData = dataset[selectedRowIndex];
+    if (!rowData) return;
+
+    const oldHtml = btnElement.innerHTML;
+    btnElement.style.pointerEvents = 'none';
+    btnElement.innerHTML = `<div><span class="spinner-border spinner-border-sm text-primary me-2"></span>Memproses PDF...</div>`;
+
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'generatePDF', rowData, docId, name })
+      });
+      const res = await response.json();
+
+      btnElement.style.pointerEvents = 'auto';
+      btnElement.innerHTML = oldHtml;
+
+      if (res.success) {
+        spdoModalInstance.hide();
+        downloadPdfBase64(res.pdfBase64, res.fileName);
+      } else {
+        alert('Gagal membuat PDF SPDO: ' + res.error);
+      }
+    } catch (err) {
+      btnElement.style.pointerEvents = 'auto';
+      btnElement.innerHTML = oldHtml;
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function printDoc(index, templateKey, evt) {
+    const rowData = dataset[index];
+    if (!rowData) return;
+
+    const btn = evt.currentTarget;
+    const oldHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Process...`;
+
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'generatePDF', rowData, templateKey })
+      });
+      const res = await response.json();
+
+      btn.disabled = false;
+      btn.innerHTML = oldHtml;
+
+      if (res.success) {
+        downloadPdfBase64(res.pdfBase64, res.fileName);
+      } else {
+        alert('Gagal membuat PDF: ' + res.error);
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = oldHtml;
+      alert('Error: ' + err.message);
+    }
+  }
+
+  function downloadPdfBase64(base64Data, fileName) {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+  }
+</script>
 </body>
 </html>
